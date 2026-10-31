@@ -1,0 +1,175 @@
+{
+  "cast": {
+    "defender": {
+      "c": "human",
+      "gloves": true,
+      "shirtless": false,
+      "col": "#2878c7"
+    },
+    "attacker": {
+      "c": "human",
+      "gloves": true,
+      "col": "#d94b43"
+    }
+  },
+  "scenes": [
+    {
+      "dur": 8,
+      "theme": "ring",
+      "mood": "professional boxing match",
+      "actors": [
+        {
+          "who": "defender",
+          "c": "human",
+          "x": 0.38,
+          "y": 0.76,
+          "dir": 1,
+          "s": 1.15,
+          "act": "guard",
+          "gloves": true,
+          "col": "#2878c7"
+        },
+        {
+          "who": "attacker",
+          "c": "human",
+          "x": 0.64,
+          "y": 0.76,
+          "dir": -1,
+          "s": 1.15,
+          "act": "idle",
+          "gloves": true,
+          "col": "#d94b43"
+        }
+      ],
+      "events": [
+        {
+          "actor": "attacker",
+          "target": "defender",
+          "type": "attack",
+          "action": "punch",
+          "at": 0.08,
+          "contact": 0.32,
+          "end": 0.48
+        },
+        {
+          "actor": "defender",
+          "target": "attacker",
+          "type": "block",
+          "action": "blockHead",
+          "at": 0.2,
+          "end": 0.52
+        },
+        {
+          "actor": "attacker",
+          "target": "defender",
+          "type": "attack",
+          "action": "punch",
+          "at": 0.58,
+          "contact": 0.77,
+          "end": 0.94
+        },
+        {
+          "actor": "defender",
+          "target": "attacker",
+          "type": "block",
+          "action": "blockHook",
+          "at": 0.66,
+          "end": 0.98
+        }
+      ],
+      "cam": {
+        "from": {
+          "x": 0.5,
+          "y": 0.55,
+          "z": 1.15
+        },
+        "to": {
+          "x": 0.5,
+          "y": 0.55,
+          "z": 1.15
+        }
+      },
+      "tx": "BLOCK TEST 01 — HIGH / HOOK",
+      "tr": "fade"
+    },
+    {
+      "dur": 8,
+      "theme": "ring",
+      "mood": "boxing body shot defense",
+      "actors": [
+        {
+          "who": "defender",
+          "c": "human",
+          "x": 0.38,
+          "y": 0.76,
+          "dir": 1,
+          "s": 1.15,
+          "act": "guard",
+          "gloves": true,
+          "col": "#2878c7"
+        },
+        {
+          "who": "attacker",
+          "c": "human",
+          "x": 0.64,
+          "y": 0.76,
+          "dir": -1,
+          "s": 1.15,
+          "act": "idle",
+          "gloves": true,
+          "col": "#d94b43"
+        }
+      ],
+      "events": [
+        {
+          "actor": "attacker",
+          "target": "defender",
+          "type": "attack",
+          "action": "punch",
+          "at": 0.08,
+          "contact": 0.31,
+          "end": 0.48
+        },
+        {
+          "actor": "defender",
+          "target": "attacker",
+          "type": "block",
+          "action": "blockBody",
+          "at": 0.2,
+          "end": 0.54
+        },
+        {
+          "actor": "attacker",
+          "target": "defender",
+          "type": "attack",
+          "action": "punch",
+          "at": 0.58,
+          "contact": 0.79,
+          "end": 0.95
+        },
+        {
+          "actor": "defender",
+          "target": "attacker",
+          "type": "block",
+          "action": "blockFront",
+          "at": 0.68,
+          "end": 0.98
+        }
+      ],
+      "cam": {
+        "from": {
+          "x": 0.5,
+          "y": 0.55,
+          "z": 1.15
+        },
+        "to": {
+          "x": 0.5,
+          "y": 0.55,
+          "z": 1.15
+        }
+      },
+      "tx": "BLOCK TEST 02 — BODY / FRONT",
+      "tr": "cut"
+    }
+  ]
+}
