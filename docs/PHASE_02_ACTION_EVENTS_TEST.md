@@ -143,8 +143,8 @@ This fixture validates the first defensive-action increment on the existing huma
         {"who": "zombie", "x": 0.52, "to": 0.52, "y": 0.76, "s": 1.05, "act": "idle"}
       ],
       "events": [
-        {"at": 0.12, "end": 0.48, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.45},
-        {"at": 0.34, "end": 0.52, "type": "dodge", "actor": "boxer", "target": "zombie"},
+        {"at": 0.12, "end": 0.48, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.47},
+        {"at": 0.37, "end": 0.54, "type": "dodge", "actor": "boxer", "target": "zombie"},
         {"at": 0.60, "end": 0.90, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.76},
         {"at": 0.60, "end": 0.90, "type": "block", "actor": "boxer", "target": "zombie"}
       ],
@@ -161,7 +161,7 @@ This fixture validates the first defensive-action increment on the existing huma
 
 ### Expected behavior
 
-- At 12%, the zombie begins one punch. The zombie's punch visibly begins extending before the boxer reacts at 34%. The first punch contact is delayed to 45%, leaving time for the boxer to clear the line before impact.
+- At 12%, the zombie begins one punch. The zombie's punch visibly begins extending before the boxer reacts at 37%. The first punch contact is delayed to 47%, leaving time for the boxer to clear the line before impact.
 - The boxer shifts backward a moderate distance with a compact guard; the arms stay attached and the torso uses only a modest lean. The move eases out, briefly holds, then returns during the final part of the event.
 - The dodge is a single event-driven action; it must not loop or be mistaken for a jump.
 - At 60%, the boxer transitions into a two-forearm shield: elbows spread slightly, forearms angle inward, and both gloved hands meet near the centerline of the upper chest. Both arms are drawn in front of the torso.
@@ -191,7 +191,7 @@ Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
 
 ### Changes under test
 
-- Dodge now starts at 34%, after the attack's visible extension begins (the attack event starts at 12%). The first punch contact is moved to 45% to leave a usable reaction window. The dodge retains the moderate 34 px backstep, compact arm guard and modest lean.
+- Dodge now starts at 37%, after the attack's visible extension begins (the attack event starts at 12%). The first punch contact is moved to 47% to leave a usable reaction window. The dodge retains the moderate 34 px backstep, compact arm guard and modest lean.
 - Fixed the block draw-order index: the defender is now actually drawn after (in front of) the striker during a matched block. Both forearms are redrawn over the torso as a visible shield. The matching attack receives an internal blocked flag and its lead-arm extension is capped at 68% at contact, preventing the glove from reaching the torso. This is a deterministic 2D contact approximation, not a general collision solver or damage system.
 - The puncher's non-striking arm remains in the compact guard pose. The approved single-punch wind-up/contact/retraction curve is unchanged for unblocked punches.
 
