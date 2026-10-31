@@ -153,6 +153,11 @@ Phase 02 is about deterministic action choreography, interaction causality, and 
 ## Status
 
 - Branch created: `phase-02-action-cinema` from `phase-01-core`.
-- Plan authored from static inspection of source.
-- No renderer code has been changed in this phase yet.
-- No browser playback, visual comparison, or export test has been run for this phase.
+- Initial Action Event evaluator added to the existing inline script; legacy scenes without `events` continue through the existing action path.
+- Shot events are evaluated from normalized local shot time, so the selected event state is derived from the requested timestamp rather than prior playback history.
+- Added contact-timed punch extension/retraction and target-facing for authored `attack` / `react` events.
+- Corrected the duration selector label so value 0 clearly means use the JSON duration.
+- Added `docs/PHASE_02_ACTION_EVENTS_TEST.md` with an 8-second boxer/zombie smoke-test fixture.
+- Latest source commit at this update: `646c4affba362fbbc5ac164d0474926304d409a6` (subsequent docs commit does not alter source).
+- Verification performed: source-level inspection of inserted helper, actor-renderer call site, punch phase calculation, and UI label. No browser playback, visual comparison, runtime console test, or export test has been run for this phase.
+- Known remaining work: reaction-body displacement and collision/contact geometry; actor gaze/head orientation; event-driven approach paths; broader action state machine; camera shot grammar and camera moves; event validation/warnings; seek/export parity tests.
