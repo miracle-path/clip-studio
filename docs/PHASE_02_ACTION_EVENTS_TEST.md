@@ -209,3 +209,5 @@ Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
 Static source checks only. Inline JavaScript syntax and fixture JSON must be checked after edits; visual playback, dodge feel, block readability and the zombie arm pose still require user verification in a browser. Do not mark visual acceptance as PASS until user feedback confirms it.
 
 - Latest block-pose refinement: replaced the shared-centerline angle pose with two independently drawn, mirrored guard arms. Each arm starts from its own left/right shoulder anchor, bends outward at the elbow, and brings the fist back beside the face. The block-only draw path is isolated; punch and dodge arm geometry are unchanged. This is a visual pose refinement, not physical collision detection.
+
+- Screenshot-driven correction (`Weird Block.PNG`): the prior mirrored guard kept each fist too far outside its own elbow, producing a side-mounted `<>` silhouette. The revised mirrored path places elbows wider (`±46`) and fists inward beside the cheeks (`±28`, y `-267`), with two curved segments per arm. Verify that both fists read as a compact face-level guard and do not overlap the face.
