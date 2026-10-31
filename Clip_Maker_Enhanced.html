@@ -384,8 +384,9 @@ function normalizeSceneData(j){
     const sc={...parent,...shot};delete sc.shots;
     if(sc.dur!=null&&sc.w==null&&sc.duration==null)sc.w=sc.dur;
     if(sc.text&&typeof sc.text==='object'){
-     sc.highlight=shot.text.h??sc.highlight??'';
-     sc.text=shot.text.t??'';
+     const tx=sc.text;
+     sc.highlight=tx.h??sc.highlight??'';
+     sc.text=tx.t??'';
     }
     if(sc.crowd==null&&j.crowd!=null)sc.crowd=j.crowd;
     scenes.push(sc);
