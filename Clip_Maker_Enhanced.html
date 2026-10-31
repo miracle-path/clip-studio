@@ -308,7 +308,7 @@ function actors(list,t,lt,k,events){
   else if(act=='dance'){bob=-Math.abs(Math.sin(ph))*10;lean=Math.sin(ph*.5)*.12;aL=2.4+Math.sin(ph)*.5;aR=-2.4-Math.sin(ph)*.5;lL=Math.sin(ph*.5)*.35;lR=-lL;kb=.3}
   else if(act=='punch'){const u=a._eventPhase==null?null:clamp(a._eventPhase),cp=a._eventContact,reach=u==null?null:(cp==null?Math.sin(Math.PI*u):u<=cp?ez(u/Math.max(.01,cp)):1-ez((u-cp)/Math.max(.01,1-cp))),q=reach==null?Math.sin(t*7):reach*2-1,aq=reach==null?Math.abs(q):reach;aL=q>0?1.6:2.3;bL=q>0?.15:1.9;aR=q<0?1.6:2.1;bR=q<0?.15:1.9;lL=.35;lR=-.3;kb=.35;lean=.1+.08*aq;bob=-aq*6}
   else if(act=='guard'){aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=.05;bob=Math.sin(t*4)*3}
-  else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5)),recoil=1-ez(u);lean=-.62*recoil;rot=-.16*recoil;aL=-1.05;aR=-1.35;lL=.28;lR=-.18;bob=-4*recoil-Math.sin(Math.PI*Math.min(1,u*1.4))*8}
+  else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5)),recoil=1-ez(u),impact=1-ez(clamp(u/.18));lean=-.78*recoil;rot=-.24*recoil;aL=-1.25;aR=-1.55;lL=.34;lR=-.22;bob=-7*recoil-Math.sin(Math.PI*Math.min(1,u*1.4))*9}
   else if(act=='ko'){const u=ez(clamp(k*3));rot=-1.45*u;dy=-20*u;aL=-.3;aR=-.5;lL=.1;lR=0}
   else if(act=='kick'){const q=Math.sin(t*6);lL=q>0?1.4:.3;lR=-.2;aL=-.6;aR=1.0;lean=-.15}
   else if(act=='sit'){dy=130;lL=1.5;lR=1.5;kb=.1;aL=.5;aR=-.2}
@@ -319,6 +319,7 @@ function actors(list,t,lt,k,events){
   if(ty=='human'||ty=='zombie'){fig(a,ty,x,y,s*SC*(a.h||1),SC,{dy,bob,lean,rot,aL,aR,lL,lR,kL,kR,bL,bR},act,t,dir,a.who||a.id||ty);continue}
   if(ty=='kangaroo'){kang(a,x,y,s*SC,SC,{dy,bob,lean,rot,aL,aR,lL,lR,kL,kR,bL,bR},act,t,dir,a.who||a.id||ty);continue}
   const T=a.col||(pet?P.skin:P.top),HC=pet?T:P.skin,LC=pet?T:P.bot,AC=pet?T:(ty=='robot'?P.top:P.skin),hy=-135;
+  if(act=='hit'&&a._eventPhase!=null){const impact=1-ez(clamp(a._eventPhase/.18));x-=dir*18*impact;}
   g.save();g.translate(x,y);shadowAt(0,0,70*s*SC*(1+dy/600),12*s*SC,x);
   g.translate(0,(dy+bob)*SC);g.scale(dir*s*SC,s*SC);g.rotate(rot);
   const leg=(an,kn)=>{const [kx,ky]=seg(0,hy,an,66,26,LC),[fx,fy]=seg(kx,ky,an-kn,66,24,LC);g.fillStyle=pet?P.bot:'#222';g.beginPath();g.ellipse(fx+9,fy,18,10,0,0,7);g.fill()};
