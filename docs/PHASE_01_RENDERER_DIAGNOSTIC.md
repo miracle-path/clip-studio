@@ -125,10 +125,22 @@ Duration note: the supplied 24 shot durations sum to approximately 44.5 seconds.
 6. Only after timeline compilation is correct, tune character posing, camera motion, visual effects, and subtitle layout.
 
 
-## 8. Safety and scope
+## 8. Implementation update — nested-shot compiler
+
+Source changes were committed to `phase-01-core`:
+- Commit `10201036f8b280405fdd6c541cecb4ecdd5a3253`: flatten nested `scenes[].shots[]`, preserve parent scene context, map `dur` to timeline weight, convert `text.t/text.h` into renderer text/highlight fields, apply root crowd data, infer total duration from valid shot durations, and remove the hard 60-second clamp in favor of UI duration → JSON duration → 60-second default.
+- Commit `916b1ad3314d816484d9b493fdde6f3804781d3f`: ensure inherited object-form text is normalized too.
+- Latest source blob SHA at time of verification: `fd85bc52481e625872f2a13d33193883fbbebd7b`.
+- Latest source size/shape before the final one-line condition correction: 104,184 bytes / 905 lines. The final correction changes only the condition text; re-fetch is required for the exact final byte/line count.
+
+**Verification status:** source was re-fetched after commits and the modified normalization/build sections were inspected. This is static source verification only. No browser playback, pixel comparison, console test, or export test has been run. Do not mark the user's four failed baseline tests as passed yet.
+
+**Known remaining work:** add robust validation for malformed scenes/weights/actors; verify actual playback using this exact fixture; inspect the character/action timing, camera follow, subtitle placement and FX only after confirming all 24 shots reach the timeline.
+
+## 9. Safety and scope
 
 - Do not modify `main`.
 - Do not replace the application or rewrite the renderer.
-- No source code has been modified as part of this diagnostic.
+- Source code has now been modified incrementally on `phase-01-core`; see the implementation update above.
 - No browser/runtime execution is claimed.
 - Work only on `phase-01-core`; make incremental commits and re-fetch/verify each changed file.
