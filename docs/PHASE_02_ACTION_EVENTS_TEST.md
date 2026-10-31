@@ -108,3 +108,7 @@ Please report whether the punch occurs once, whether the zombie reacts at the ri
 - The event schema is unchanged. One `attack` event means one punch; author additional `attack` / `react` pairs for combinations.
 - Actors using the legacy `act: "punch"` without an authored event retain their time-based looping motion; the single-punch event arc applies when an event phase is present.
 - Source-only change. Browser playback has not been run by the maintainer; verify that the lead fist visibly contacts at 58% and that only one punch is perceived.
+
+
+### Punch elbow correction
+The lead-arm wind-up now bends with the elbow below the shoulder-to-fist line, rather than folding upward into an inverted V. At contact the forearm straightens near horizontal. Event timing and contact synchronization are unchanged.
