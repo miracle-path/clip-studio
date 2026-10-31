@@ -373,7 +373,29 @@ function subtitle(text,hl,a){
 let scenes=[],total=30,playing=false,t0=0,cur=-1,rec=null,chunks=[];
 function normalizeSceneData(j){
  const cast=j.cast||j.characters||j.characterBible||{};
- const scenes=j.scenes||j.shots||j.sequence||j.beats||[];
+ const sourceScenes=j.scenes||j.shots||j.sequence||j.beats||[];
+ const scenes=[];
+ // Compile nested scene shots into timeline-ready scene records while retaining parent scene context.
+ for(const parent of Array.isArray(sourceScenes)?sourceScenes:[]){
+  if(!parent||typeof parent!=='object'||Array.isArray(parent))continue;
+  if(Array.isArray(parent.shots)&&parent.shots.length){
+   for(const shot of parent.shots){
+    if(!shot||typeof shot!=='object'||Array.isArray(shot))continue;
+    const sc={...parent,...shot};delete sc.shots;
+    if(sc.dur!=null&&sc.w==null&&sc.duration==null)sc.w=sc.dur;
+    if(shot.text&&typeof shot.text==='object'){
+     sc.highlight=shot.text.h??sc.highlight??'';
+     sc.text=shot.text.t??'';
+    }
+    if(sc.crowd==null&&j.crowd!=null)sc.crowd=j.crowd;
+    scenes.push(sc);
+   }
+  }else{
+   const sc={...parent};delete sc.shots;
+   if(sc.crowd==null&&j.crowd!=null)sc.crowd=j.crowd;
+   scenes.push(sc);
+  }
+ }
  const aliasAct={stand:'idle',standing:'idle',wait:'idle',walking:'walk',running:'run',flying:'fly',swimming:'swim',attack:'punch',shoot:'cast',charging:'channel',talk:'idle',talking:'idle',fall:'hit',dead:'ko',lying:'ko'};
  const inferTheme=(sc)=>{const q=[sc.location,sc.setting,sc.place,sc.environment,sc.background,sc.mood,...(sc.details||[])].filter(Boolean).join(' ').toLowerCase();
   if(/castle|gothic|fortress|wizard|hogwarts|ปราสาท|เวทมนตร์|หอคอย/.test(q))return 'custom';
@@ -382,7 +404,7 @@ function normalizeSceneData(j){
   sc.theme=sc.theme||sc.environmentType||sc.sceneType||inferTheme(sc);
   sc.sky=sc.sky||[sc.skyTop||sc.sky_top||'#18243c',sc.skyBottom||sc.sky_bottom||'#51405f'];
   sc.ground=sc.groundColor||sc.floor||sc.ground||'#292a38';
-  if(sc.duration&&!sc.w)sc.w=sc.duration;if(sc.weight&&!sc.w)sc.w=sc.weight;
+  if(sc.duration!=null&&sc.w==null)sc.w=sc.duration;if(sc.weight!=null&&sc.w==null)sc.w=sc.weight;if(sc.dur!=null&&sc.w==null)sc.w=sc.dur;
   if(sc.camera&&!sc.cam){const c=sc.camera;const z0=c.zoomFrom||c.zoom||1,z1=c.zoomTo||z0;sc.cam={from:{z:z0,x:c.focusX??.5,y:c.focusY??.5},to:{z:z1,x:c.focusX??.5,y:c.focusY??.5},shake:c.shake||0,roll:c.roll||0};}
   if(!sc.atm){const q=[sc.mood,sc.weather,...(Array.isArray(sc.details)?sc.details:[sc.details||''])].join(' ').toLowerCase();sc.atm={mood:/danger|battle|dark|threat|อันตราย|ต่อสู้/.test(q)?'danger':/warm|golden|sunset|hope|victory|อบอุ่น|รุ่งอรุณ/.test(q)?'warm':/cold|snow|ice|หนาว/.test(q)?'cold':/night|dark|กลางคืน/.test(q)?'night':'calm',fog:/mist|fog|หมอก/.test(q)?.42:.12,vig:.42,grain:.18};}
   if(!sc.lights&&/torch|candle|lamp|sunlight|golden|ไฟ|คบเพลิง/.test([sc.mood,...(Array.isArray(sc.details)?sc.details:[sc.details||''])].join(' ').toLowerCase()))sc.lights=[{type:'glow',x:.5,y:.42,r:.34,col:'#ffc77d',fl:.35}];
@@ -403,14 +425,15 @@ function normalizeSceneData(j){
   // Keep every beat alive: idle has subtle breathing/blinks; locomotion gets a real destination.
   if(sc.actors)sc.actors=sc.actors.map(a=>({...a,act:a.act||'idle'}));
  }
- j.cast=cast;j.scenes=scenes;return j;
+ if(!(+j.duration>0)&&scenes.length&&scenes.every(s=>Number.isFinite(+s.dur)&&+s.dur>0))j.duration=scenes.reduce((sum,s)=>sum+(+s.dur),0);
+  j.cast=cast;j.scenes=scenes;return j;
 }
 function build(){
  let j;try{j=JSON.parse($('json').value.replace(/([:\[, ]\s*)(-?)\.(\d)/g,'$1$20.$3'))}catch(e){msg('JSON ไม่ถูกต้อง: '+e.message);return false}
  j=normalizeSceneData(j);
  CAST=j.cast||{};for(const[id,sv]of Object.entries(j.assets||{})){if(IMG[id]&&IMG[id]._s===sv)continue;const im=new Image();im._s=sv;im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(sv);IMG[id]=im}scenes=(j.scenes||j).filter(s=>s);if(!scenes.length){msg('ไม่พบซีน');return false}
- total=Math.max(60,+$('oDur').value||+j.duration||60);const sw=scenes.reduce((p,s)=>p+(s.w||1),0);let a=0;
- let ct='',chl='',cts=0,cb=null,pv=null,cg=null,cgs=0,am0=null,lt0=null;scenes.forEach(s=>{s.d=total*(s.w||1)/sw;s.s=a;a+=s.d;if(s.cont&&pv){const es=a=>{const K=a.keys;if(K&&K.length){const q=K[K.length-1];return{...a,keys:undefined,x:q.x??a.x,y:q.y??a.y,rot:q.rot??a.rot,act:q.act??a.act,to:undefined}}return{...a,x:a.to??a.x,to:undefined}};if(!s.actors&&pv.actors)s.actors=pv.actors.map(es);if(!s.props&&pv.props)s.props=pv.props;if(!s.crowd&&pv.crowd)s.crowd=pv.crowd}
+ const userDur=+$('oDur').value,jsonDur=+j.duration;total=userDur>0?userDur:(jsonDur>0?jsonDur:60);const sw=scenes.reduce((p,s)=>p+(Number.isFinite(+s.w)&&+s.w>0?+s.w:1),0);let a=0;
+ let ct='',chl='',cts=0,cb=null,pv=null,cg=null,cgs=0,am0=null,lt0=null;scenes.forEach(s=>{const weight=Number.isFinite(+s.w)&&+s.w>0?+s.w:1;s.d=total*weight/sw;s.s=a;a+=s.d;if(s.cont&&pv){const es=a=>{const K=a.keys;if(K&&K.length){const q=K[K.length-1];return{...a,keys:undefined,x:q.x??a.x,y:q.y??a.y,rot:q.rot??a.rot,act:q.act??a.act,to:undefined}}return{...a,x:a.to??a.x,to:undefined}};if(!s.actors&&pv.actors)s.actors=pv.actors.map(es);if(!s.props&&pv.props)s.props=pv.props;if(!s.crowd&&pv.crowd)s.crowd=pv.crowd}
  if(!s.theme&&pv){s.decor=s.decor||pv.decor;s.hz=s.hz??pv.hz}
  if(pv){s.geo=s.geo||pv.geo;if(s.theme=='map'||!s.theme){s.roads=s.roads||pv.roads;s.areas=s.areas||pv.areas}}if(!s.theme&&pv){s.theme=pv.theme;s.sky=s.sky||pv.sky;s.ground=s.ground||pv.ground;s.sign=s.sign||pv.sign}if(s.text&&s.text!==ct){ct=s.text;chl=s.highlight||'';cts=s.s}if(s.badge)cb=s.badge;if(s.gfx){cg=[].concat(s.gfx);cgs=s.s}if(s.atm)am0=s.atm;s.am=am0;if(s.lights)lt0=s.lights;s.lt=lt0;s.gx=cg;s.gts=cgs;s.tx=ct;s.hl=chl;s.ts=cts;s.bd=cb;pv=s});return true;
 }
