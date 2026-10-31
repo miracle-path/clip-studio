@@ -144,7 +144,7 @@ This fixture validates the first defensive-action increment on the existing huma
       ],
       "events": [
         {"at": 0.12, "end": 0.48, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.36},
-        {"at": 0.12, "end": 0.48, "type": "dodge", "actor": "boxer", "target": "zombie"},
+        {"at": 0.22, "end": 0.48, "type": "dodge", "actor": "boxer", "target": "zombie"},
         {"at": 0.60, "end": 0.90, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.76},
         {"at": 0.60, "end": 0.90, "type": "block", "actor": "boxer", "target": "zombie"}
       ],
@@ -161,11 +161,11 @@ This fixture validates the first defensive-action increment on the existing huma
 
 ### Expected behavior
 
-- At 12%, the zombie begins one punch while the boxer begins a timed dodge.
-- The boxer shifts backward relative to the attacker, leans away, and returns toward the original mark by the end of the dodge event.
+- At 12%, the zombie begins one punch. The boxer waits until 22% before reacting with a controlled dodge, leaving a visible reaction delay while still clearing the 36% contact point.
+- The boxer shifts backward a moderate distance with a compact guard; the arms stay attached and the torso uses only a modest lean. The move eases out, briefly holds, then returns more quickly during the final part of the event.
 - The dodge is a single event-driven action; it must not loop or be mistaken for a jump.
-- At 60%, the boxer transitions into a compact block pose with both forearms presented across the torso line.
-- The second zombie punch reaches its authored contact time at 76%, while the boxer maintains the block pose.
+- At 60%, the boxer transitions into a two-forearm shield angled toward the incoming attacker. Both forearms are drawn in front of the torso.
+- The second zombie punch reaches its authored contact time at 76%, while the boxer maintains the block pose. The attack event is marked as blocked and its striking arm is capped before full torso penetration; the defender is drawn in front of the striker at contact.
 - The boxer must not enter the hit recoil pose during the block event.
 - The existing passing one-punch fixture and punch wind-up/contact/retraction behavior must remain unchanged.
 
@@ -191,9 +191,9 @@ Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
 
 ### Changes under test
 
-- Dodge now uses a fast snap-out phase (first 16% of its event), holds the evade position, then returns during the final 32%. Backward displacement increased from 34 to 58 renderer pixels and the lean/recoil pose is stronger. The dodge event should begin after the opponent's attack starts but well before the authored contact time.
-- When an attack's target has a matching active `block` event at the attack contact time, draw order places the defender in front of the striker. This is a 2D visual occlusion approximation so the forearms can cover the incoming glove; it is not a collision solver or damage system.
-- The puncher's non-striking arm now uses the same compact guard pose as the dedicated guard action instead of the previous folded-back angle pair. The lead-arm punch wind-up, contact timing, extension and retraction curve are unchanged.
+- Dodge now starts at 22% (after the zombie's 12% attack start), uses a moderate 34 px backstep, a compact guard pose and a modest lean. It eases out over 34% of its event, briefly holds, then returns over the final 38%.
+- Fixed the block draw-order index: the defender is now actually drawn after (in front of) the striker during a matched block. Both forearms are redrawn over the torso as a visible shield. The matching attack receives an internal blocked flag and its lead-arm extension is capped at 68% at contact, preventing the glove from reaching the torso. This is a deterministic 2D contact approximation, not a general collision solver or damage system.
+- The puncher's non-striking arm remains in the compact guard pose. The approved single-punch wind-up/contact/retraction curve is unchanged for unblocked punches.
 
 ### Retest checklist
 
