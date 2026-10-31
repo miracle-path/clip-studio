@@ -876,6 +876,32 @@ function voices(){const s=$('oVoiceSel'),vs=speechSynthesis.getVoices().filter(v
 if(window.speechSynthesis){speechSynthesis.onvoiceschanged=voices;voices()}
 $('bPlay').onclick=play;$('bStop').onclick=()=>stop();$('bRec').onclick=record;
 document.fonts.load('700 40px Kanit').then(()=>{if(build())frame(0.5)});
+
+/* ---------- AnimCore state accessors (Sprint 0) ---------- */
+// Read-only bridge from a future sidecar into this classic script's lexical state.
+// Keep these accessors inside this script: top-level let/const bindings are not window properties.
+const __CM_STATE__ = Object.freeze({
+ get scenes(){ return scenes; },
+ get total(){ return total; },
+ get t0(){ return t0; },
+ set t0(value){ t0 = Number(value) || 0; },
+ get cur(){ return cur; },
+ get playing(){ return playing; },
+ get POSG(){ return POSG; },
+ get ANCH(){ return ANCH; },
+ get CAMI(){ return CAMI; },
+ get CAST(){ return CAST; },
+ get DIRS(){ return DIRS; },
+ get IMG(){ return IMG; },
+ get GEO(){ return GEO; },
+ get LT(){ return LT; }
+});
+Object.defineProperty(window, '__CM_STATE__', {
+ value: __CM_STATE__,
+ enumerable: false,
+ configurable: false,
+ writable: false
+});
 </script>
 </body>
 </html>
