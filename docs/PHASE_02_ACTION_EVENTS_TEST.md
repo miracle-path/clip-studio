@@ -119,3 +119,67 @@ The lead-arm wind-up now bends with the elbow below the shoulder-to-fist line, r
 - The punch now holds a visibly cocked, rearward elbow position through the early approach, then accelerates through the final 38% before authored contact.
 - The lead arm transitions from a bent, pulled-back wind-up to a near-horizontal straight extension at contact, then retracts after contact.
 - Contact timing and event contact coordinates are unchanged. Visual overlap ordering affects the striker/target actor draw order during the active attack only.
+
+## Defensive actions fixture — Dodge + Block
+
+This fixture validates the first defensive-action increment on the existing human/zombie procedural rigs. It deliberately reuses the same two actors and spacing as the passing punch test.
+
+### Fixture JSON
+
+```json
+{
+  "duration": 8,
+  "cast": {
+    "boxer": {"c": "human", "col": "#d8322f", "gloves": true},
+    "zombie": {"c": "zombie", "col": "#78936c", "gloves": true}
+  },
+  "scenes": [
+    {
+      "theme": "ring",
+      "sky": ["#171a2e", "#4b3545"],
+      "ground": "#29232b",
+      "actors": [
+        {"who": "boxer", "x": 0.40, "to": 0.40, "y": 0.76, "s": 1.05, "act": "idle"},
+        {"who": "zombie", "x": 0.52, "to": 0.52, "y": 0.76, "s": 1.05, "act": "idle"}
+      ],
+      "events": [
+        {"at": 0.12, "end": 0.48, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.36},
+        {"at": 0.12, "end": 0.48, "type": "dodge", "actor": "boxer", "target": "zombie"},
+        {"at": 0.60, "end": 0.90, "type": "attack", "actor": "zombie", "target": "boxer", "action": "punch", "contact": 0.76},
+        {"at": 0.60, "end": 0.90, "type": "block", "actor": "boxer", "target": "zombie"}
+      ],
+      "text": "หลบหมัดแรก แล้วตั้งแขนรับหมัดที่สอง",
+      "highlight": "หลบหมัด",
+      "cam": {
+        "from": {"x": 0.5, "y": 0.62, "z": 1},
+        "to": {"x": 0.5, "y": 0.62, "z": 1}
+      }
+    }
+  ]
+}
+```
+
+### Expected behavior
+
+- At 12%, the zombie begins one punch while the boxer begins a timed dodge.
+- The boxer shifts backward relative to the attacker, leans away, and returns toward the original mark by the end of the dodge event.
+- The dodge is a single event-driven action; it must not loop or be mistaken for a jump.
+- At 60%, the boxer transitions into a compact block pose with both forearms presented across the torso line.
+- The second zombie punch reaches its authored contact time at 76%, while the boxer maintains the block pose.
+- The boxer must not enter the hit recoil pose during the block event.
+- The existing passing one-punch fixture and punch wind-up/contact/retraction behavior must remain unchanged.
+
+### Current implementation boundary
+
+- Dodge and block are event-driven poses on the human/zombie rig. Dodge includes a short lateral/backward displacement and a lean-away motion; block uses a forward forearm guard and compact torso posture.
+- This increment does not implement collision detection, attack cancellation, damage calculation, or a physical solver that proves the glove contacts the forearms. Judge whether the block reads clearly in the rendered scene; contact geometry is a later step.
+- Static source inspection only. Browser playback, perceived motion quality, and visual contact alignment require user testing. Do not mark this fixture PASS until the user verifies it in Chrome/Edge.
+
+### User test checklist
+
+1. Does the boxer visibly evade the first punch rather than jump vertically?
+2. Does the boxer move away and return smoothly without sliding too far?
+3. Does the boxer raise a clear two-arm block before the second punch arrives?
+4. Does the second punch read as being met by the guard rather than striking the torso?
+5. Does the boxer avoid the hit-recoil pose during the block?
+6. Does the original punch-only fixture still look exactly as good as the previously approved version?
