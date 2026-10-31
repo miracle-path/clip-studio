@@ -104,6 +104,7 @@ Please report whether the punch occurs once, whether the zombie reacts at the ri
 
 - Static inspection found the previous `punch` pose drove both arm angles in opposite phases (`q`), making one attack event look like repeated/alternating punches.
 - The lead arm now performs one wind-up → extension → retraction arc driven by the event contact curve; the rear arm stays in a fixed guard pose.
+- The lead-arm shoulder angle now finishes near horizontal at contact, with a modest tucked-elbow wind-up and a straight forearm at full extension. This changes pose geometry only; event timing/contact evaluation is unchanged.
 - The event schema is unchanged. One `attack` event means one punch; author additional `attack` / `react` pairs for combinations.
 - Actors using the legacy `act: "punch"` without an authored event retain their time-based looping motion; the single-punch event arc applies when an event phase is present.
 - Source-only change. Browser playback has not been run by the maintainer; verify that the lead fist visibly contacts at 58% and that only one punch is perceived.
