@@ -334,7 +334,7 @@ function actors(list,t,lt,k,events){
    lL=.28;lR=-.22;kb=.35;lean=.1+.08*aq;bob=-aq*6
   }
   else if(act=='guard'){aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=.05;bob=Math.sin(t*4)*3}
-  else if(act=='block'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=-.85;aR=.85;bL=1.4;bR=-1.4;lL=.08;lR=-.08;kb=.35;lean=-.035*q;bob=-2*q}
+  else if(act=='block'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=-.85;aR=.85;bL=3.7;bR=-3.7;lL=.08;lR=-.08;kb=.35;lean=-.035*q;bob=-2*q}
   else if(act=='dodge'){const dp=clamp(a._eventPhase??0),q=dp<.34?ez(dp/.34):dp<.62?1:1-ez((dp-.62)/.38);aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=-.28*q;rot=0;bob=-2*q}
   else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5)),recoil=1-ez(u);lean=-.78*recoil;rot=-.24*recoil;aL=-1.25;aR=-1.55;lL=.34;lR=-.22;bob=-7*recoil-Math.sin(Math.PI*Math.min(1,u*1.4))*9}
   else if(act=='ko'){const u=ez(clamp(k*3));rot=-1.45*u;dy=-20*u;aL=-.3;aR=-.5;lL=.1;lR=0}
