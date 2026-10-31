@@ -165,6 +165,7 @@ This fixture validates the first defensive-action increment on the existing huma
 - The boxer shifts backward a moderate distance with a compact guard; the arms stay attached and the torso uses only a modest lean. The move eases out, briefly holds, then returns during the final part of the event.
 - The dodge is a single event-driven action; it must not loop or be mistaken for a jump.
 - At 60%, the boxer transitions into a two-forearm shield: elbows spread slightly, forearms angle inward, and both gloved hands meet near the centerline of the upper chest. Both arms are drawn in front of the torso.
+- The block rig's shoulder endpoints must start at the same local shoulder line as the normal arm rig (`y = -246`), not down inside the torso. Fists should finish beside the left/right cheek edges, not overlap the center of the face. This specifically prevents the disconnected, side-mounted `<>` silhouette from the previous custom arm path.
 - The second zombie punch reaches its authored contact time at 76%, while the boxer maintains the block pose. The attack event is marked as blocked, its striking arm is capped at a shorter extension, and the defender is drawn in front of the striker at contact. The forearm shield must visibly cover the incoming glove.
 - The boxer must not enter the hit recoil pose during the block event.
 - The existing passing one-punch fixture and punch wind-up/contact/retraction behavior must remain unchanged.
