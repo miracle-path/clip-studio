@@ -57,7 +57,8 @@ The first fixture placed the actor centers at x=0.36 and x=0.58 (0.22 canvas-wid
 
 - Boxer and zombie both face each other from the first frame (unless an explicit actor `face` overrides the inferred event pairing).
 - Boxer raises guard at 22% of the shot.
-- Boxer performs one punch; the arm extends toward the authored contact time (58%), then retracts by the recovery event.
+- One `attack` event produces exactly one visible punch: the lead arm winds up, extends once toward the authored contact time (58%), then retracts. The rear arm remains in guard; it must not alternate with the lead arm or read as extra punches.
+- Multiple punches must be authored as multiple `attack` events, each with its own contact time and a corresponding target `react` event.
 - At 58%, the zombie should snap backward immediately as the punch reaches contact, with a brief whole-body displacement plus a stronger torso recoil; it must not react before 58%.
 - The initial knockback should be sharp and brief, then settle smoothly rather than looking like a delayed wobble.
 - Boxer returns to idle/recovery at 76%.
@@ -97,3 +98,11 @@ Please report whether the punch occurs once, whether the zombie reacts at the ri
 - `react` and `hit` events now use a shorter default event duration of 8% of the scene (unless an explicit `end` is authored). In the 8-second fixture this is about 0.64 seconds, instead of the previous 2.24-second fallback.
 - The initial knockback still begins at the authored `react.at` time (58%); the event time itself has not been moved earlier.
 - Static source inspection only. Browser playback is still required to verify perceived contact sync and recovery quality.
+
+
+## Single-punch pose correction — latest increment
+
+- Static inspection found the previous `punch` pose drove both arm angles in opposite phases (`q`), making one attack event look like repeated/alternating punches.
+- The lead arm now performs one wind-up → extension → retraction arc driven by the event contact curve; the rear arm stays in a fixed guard pose.
+- The event schema is unchanged. One `attack` event means one punch; author additional `attack` / `react` pairs for combinations.
+- Source-only change. Browser playback has not been run by the maintainer; verify that the lead fist visibly contacts at 58% and that only one punch is perceived.
