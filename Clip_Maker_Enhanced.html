@@ -319,8 +319,8 @@ function actors(list,t,lt,k,events){
   if(ty=='human'||ty=='zombie'){fig(a,ty,x,y,s*SC*(a.h||1),SC,{dy,bob,lean,rot,aL,aR,lL,lR,kL,kR,bL,bR},act,t,dir,a.who||a.id||ty);continue}
   if(ty=='kangaroo'){kang(a,x,y,s*SC,SC,{dy,bob,lean,rot,aL,aR,lL,lR,kL,kR,bL,bR},act,t,dir,a.who||a.id||ty);continue}
   const T=a.col||(pet?P.skin:P.top),HC=pet?T:P.skin,LC=pet?T:P.bot,AC=pet?T:(ty=='robot'?P.top:P.skin),hy=-135;
-  if(act=='hit'&&a._eventPhase!=null){const impact=1-ez(clamp(a._eventPhase/.18));x-=dir*18*impact;}
-  g.save();g.translate(x,y);shadowAt(0,0,70*s*SC*(1+dy/600),12*s*SC,x);
+  const impactShift=act=='hit'&&a._eventPhase!=null?dir*18*(1-ez(clamp(a._eventPhase/.18))):0;
+  g.save();g.translate(x-impactShift,y);shadowAt(0,0,70*s*SC*(1+dy/600),12*s*SC,x);
   g.translate(0,(dy+bob)*SC);g.scale(dir*s*SC,s*SC);g.rotate(rot);
   const leg=(an,kn)=>{const [kx,ky]=seg(0,hy,an,66,26,LC),[fx,fy]=seg(kx,ky,an-kn,66,24,LC);g.fillStyle=pet?P.bot:'#222';g.beginPath();g.ellipse(fx+9,fy,18,10,0,0,7);g.fill()};
   const arm=an=>{const [ex,ey]=seg(0,-218,an,42,18,AC),[hx,hh]=seg(ex,ey,an+(act=='run'?1:.3),40,16,AC);g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hh,11,0,7);g.fill();if(an===aL)ANCH[a.who||a.id||ty]=wpt(hx,hh)};
