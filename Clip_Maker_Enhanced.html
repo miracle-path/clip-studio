@@ -383,7 +383,7 @@ function normalizeSceneData(j){
     if(!shot||typeof shot!=='object'||Array.isArray(shot))continue;
     const sc={...parent,...shot};delete sc.shots;
     if(sc.dur!=null&&sc.w==null&&sc.duration==null)sc.w=sc.dur;
-    if(shot.text&&typeof shot.text==='object'){
+    if(sc.text&&typeof sc.text==='object'){
      sc.highlight=shot.text.h??sc.highlight??'';
      sc.text=shot.text.t??'';
     }
