@@ -351,7 +351,7 @@ function actors(list,t,lt,k,events){
   g.translate(0,(dy+bob)*SC);g.scale(dir*s*SC,s*SC);g.rotate(rot);
   const leg=(an,kn)=>{const [kx,ky]=seg(0,hy,an,66,26,LC),[fx,fy]=seg(kx,ky,an-kn,66,24,LC);g.fillStyle=pet?P.bot:'#222';g.beginPath();g.ellipse(fx+9,fy,18,10,0,0,7);g.fill()};
   const arm=an=>{const [ex,ey]=seg(0,-218,an,42,18,AC),[hx,hh]=seg(ex,ey,an+(act=='run'?1:.3),40,16,AC);g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hh,11,0,7);g.fill();if(an===aL)ANCH[a.who||a.id||ty]=wpt(hx,hh)};
-  const blockArm=side=>{const sx=side*23,ex=side*49,hx=6+side*42,hy=-270;g.strokeStyle=AC;g.lineCap='round';g.lineJoin='round';g.lineWidth=17;g.beginPath();g.moveTo(sx,-246);g.quadraticCurveTo(side*38,-242,ex,-254);g.quadraticCurveTo(side*52,-267,hx,hy);g.stroke();g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hy,11,0,7);g.fill()};
+  const blockArm=side=>{const sx=side*25,ex=side*55,hx=side*39,hy=-263;g.strokeStyle=AC;g.lineCap='round';g.lineJoin='round';g.lineWidth=17;g.beginPath();g.moveTo(sx,-216);g.quadraticCurveTo(side*43,-218,ex,-235);g.quadraticCurveTo(side*51,-251,hx,hy);g.stroke();g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hy,11,0,7);g.fill()};
   leg(lR,kR);
   if(ty=='cat'){g.strokeStyle=T;g.lineWidth=16;g.lineCap='round';g.beginPath();g.moveTo(-28,-150);g.quadraticCurveTo(-100,-170,-85,-230+Math.sin(t*4)*18);g.stroke()}
   g.save();g.translate(0,hy);g.rotate(lean);g.translate(0,-hy);
