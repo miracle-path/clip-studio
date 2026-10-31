@@ -309,7 +309,7 @@ function actors(list,t,lt,k,events){
   else if(act=='punch'){
    const u=a._eventPhase==null?null:clamp(a._eventPhase),cp=a._eventContact,
     reach=u==null?null:(cp==null?Math.sin(Math.PI*u):u<=cp?((u/Math.max(.01,cp))<.82?.38*ez((u/Math.max(.01,cp))/.82):.38+.62*ez(((u/Math.max(.01,cp))-.82)/.18)):1-ez((u-cp)/Math.max(.01,1-cp))),
-    aq=reach==null?0:reach;
+    aq=reach==null?.5+.5*Math.sin(t*7):reach;
    // One attack event is one punch: drive only the lead arm through a single wind-up/contact/retract arc.
    // Keep the rear arm in a stable guard so the pose cannot read as alternating multi-punches.
    aL=lerp(2.3,1.35,aq);bL=lerp(-2.7,0,aq);
