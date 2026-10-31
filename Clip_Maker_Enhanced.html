@@ -289,7 +289,8 @@ function evaluateActionEvents(list,events,k){
  }
  return states;
 }
-function actors(list,t,lt,k){
+function actors(list,t,lt,k,events){
+ const eventStates=evaluateActionEvents(list,events,k);
  const POS={},ord=[];for(const a0 of list||[]){let b={...(CAST[a0.who]||{}),...a0};if(b.keys)b=kf(b,k);const yy=b.y??(b.c=='fish'||b.c=='bird'?.4:.72);POS[b.who||b.id||b.c]={x:b.keys?b.x:lerp(b.x??.5,b.to??b.x??.5,clamp(k)),y:yy};ord.push([a0,yy])}
  ord.sort((p,q)=>p[1]-q[1]);POSG=POS;
  for(let a of ord.map(o=>o[0])){a={...(CAST[a.who]||{}),...a};if(a.keys)a=kf(a,k);a={...a,...(eventStates[a.who||a.id]||{})};
