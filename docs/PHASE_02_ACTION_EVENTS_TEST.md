@@ -27,8 +27,8 @@ Verify the first incremental Action Event implementation on top of the Phase 01 
       "sky": ["#171a2e", "#4b3545"],
       "ground": "#29232b",
       "actors": [
-        {"who": "boxer", "x": 0.36, "to": 0.36, "y": 0.76, "s": 1.05, "act": "idle"},
-        {"who": "zombie", "x": 0.58, "to": 0.58, "y": 0.76, "s": 1.05, "act": "idle"}
+        {"who": "boxer", "x": 0.40, "to": 0.40, "y": 0.76, "s": 1.05, "act": "idle"},
+        {"who": "zombie", "x": 0.52, "to": 0.52, "y": 0.76, "s": 1.05, "act": "idle"}
       ],
       "events": [
         {"at": 0.08, "type": "notice", "actor": "boxer", "target": "zombie"},
@@ -47,6 +47,11 @@ Verify the first incremental Action Event implementation on top of the Phase 01 
   ]
 }
 ```
+
+
+### Staging correction — commit pending
+
+The first fixture placed the actor centers at x=0.36 and x=0.58 (0.22 canvas-width apart). The renderer does not yet implement automatic attack approach or collision resolution, so this staging distance made the punch visibly miss. The smoke-test fixture is now tightened to x=0.40 and x=0.52 (0.12 canvas-width apart) to place the target within the current procedural arm's approximate reach. This is a fixture correction, not a claim that automatic approach/collision has been implemented. A future increment must add authored approach movement and contact alignment for arbitrary starting distances.
 
 ## What should be visible
 
