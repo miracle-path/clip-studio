@@ -161,3 +161,13 @@ Phase 02 is about deterministic action choreography, interaction causality, and 
 - Latest source commit at this update: `646c4affba362fbbc5ac164d0474926304d409a6` (subsequent docs commit does not alter source).
 - Verification performed: source-level inspection of inserted helper, actor-renderer call site, punch phase calculation, and UI label. No browser playback, visual comparison, runtime console test, or export test has been run for this phase.
 - Known remaining work: reaction-body displacement and collision/contact geometry; actor gaze/head orientation; event-driven approach paths; broader action state machine; camera shot grammar and camera moves; event validation/warnings; seek/export parity tests.
+
+### Latest user smoke-test feedback and corrective patch
+
+User confirmed the boxer raises guard and punches exactly once. User reported that the zombie reaction did not visually align with impact and that the zombie initially faced the wrong direction before turning toward the boxer.
+
+Source correction committed as `451a5ae178976a7cfa73edd29589ce4354fb88c9` on `phase-02-action-cinema`:
+- Infer initial actor facing from event `target` / `source` relationships before those events begin. Explicit actor-level `face` remains higher priority.
+- Strengthen `hit` reaction with a clear torso recoil and body rotation that decay over the event phase.
+- Static verification: inline JavaScript syntax passed; isolated event evaluator confirmed zombie has no `hit` state at k=0.579 and enters `hit` at k=0.58.
+- Not verified: browser playback, visual hit/contact alignment, export parity. User must re-run the same 8-second fixture.
