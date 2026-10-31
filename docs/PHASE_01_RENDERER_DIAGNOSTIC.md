@@ -16,12 +16,17 @@ Important discrepancy retained from the audit: the checked-in HTML has Play, Sto
 
 ## 2. Confirmed source findings
 
-### R01 — Theme renderer registry is incomplete
-- `THEMES` at line 324 registers only `road, room, city, nature, space, custom`.
-- Dedicated renderer functions exist for `ring` (line 626) and `lake` (line 423), but neither is registered.
-- `frame()` at line 715 dispatches with `(THEMES[sc.theme]||custom)`, so a scene with `theme:"ring"` or `theme:"lake"` silently renders using `custom`, not its dedicated renderer.
-- This is a confirmed scene fidelity defect for those themes. It may explain incomplete/mismatched environments when those themes are used; it does not by itself explain all four failed baseline items.
-- Proposed fix: register supported renderers explicitly, after verifying all supported theme names and their function signatures. Also add a theme-registry test.
+### R01 — Nested shot schema is not consumed (confirmed primary root cause)
+- The supplied JSON stores every event under `scenes[].shots[]`; the current normalizer only resolves the top-level `j.scenes` array (lines 375–378) and iterates those outer scene objects (line 381). It does not flatten or compile nested `shots`.
+- `build()` then compiles each outer scene as one timeline item (lines 411–415). Since the outer objects have no `actors`, `props`, or `text` fields, all shot-level actions, props, and text are omitted from playback.
+- The outer scene backgrounds still render, which can make the output look like static environments with missing characters/actions.
+- The user's shot-level `dur` is not read. The existing duration alias only checks `sc.duration` (line 385), and timeline weights use `s.w||1` (line 412). The supplied 24 shots therefore do not become 24 timeline items.
+- Confirmed consequence: shot-level camera, actors, props, transitions, and text are not compiled into the current timeline. This directly explains why the story does not play as authored and is the first issue to fix.
+- Proposed fix: add a deliberate scene/shot compiler. Each nested shot becomes a timeline item; inherit scene-level theme/sky/ground/decor/lights/atmosphere into its shots; map `dur` to a validated duration weight; map `text.t` and `text.h` to the renderer's text/highlight fields; preserve shot-level `cam`, `tr`, `actors`, `props`, and `gfx`. Do not mutate the original authoring JSON; compile to an internal representation.
+
+### R02 — Theme renderer registry is already populated for this fixture
+- Correction to the earlier preliminary note: the initial registry is declared at line 324, and additional renderers are registered at line 437: `map, photo, lake, shophouse, yamo, ring, arena`.
+- Therefore `yamo`, `shophouse`, and `ring` in the supplied JSON are registered. Theme registration is **not** the root cause for this fixture.
 
 ### R02 — Camera follow reads actor positions from the previous frame
 - `frame()` computes camera follow from `POSG[c.follow]` before it calls `actors()`.
@@ -88,7 +93,39 @@ The four reported failures are broad symptoms. To avoid guessing, use the exact 
 
 With that exact fixture, inspect the actual scene themes, actor IDs/types/actions, camera keys, text/highlight fields, and timeline weights. Then make the smallest source patch and add a matching regression fixture.
 
-## 5. Safety and scope
+## 6. Exact supplied JSON fixture — confirmed mapping gaps
+
+The user supplied a seven-scene JSON with 24 nested shots and approximately 44.5 seconds of declared shot durations.
+
+| Authoring JSON field | Current runtime expectation | Result |
+|---|---|---|
+| `scenes[].shots[]` | top-level `scenes[]` compiled directly | Nested shots ignored |
+| `shots[].dur` | `scene.duration` / `scene.w` | Shot duration ignored |
+| `shots[].text.t` and `text.h` | compiled `sc.tx` / `sc.hl` | No subtitle for these shots |
+| `shots[].actors` | `scene.actors` | Characters/actions ignored |
+| `shots[].props` | `scene.props` | Shot props ignored |
+| root `crowd` | `scene.crowd` | Root crowd ignored |
+| `shots[].gfx` | `scene.gfx` compiled to `sc.gx` | Shot graphics ignored |
+
+Supported items in this fixture:
+- Scene themes `yamo`, `shophouse`, `ring`, `road`, and `custom` are registered.
+- Actions including `run`, `jump`, `guard`, `punch`, `hit`, `kick`, `ko`, `sit`, `cheer`, `dance`, `wave`, `point`, `hold`, `cast`, and `channel` have branches in the current actor renderer.
+- Props `spark`, `aura`, `beam`, and `songthaew` have renderer branches.
+- Thus these actor/action/prop types are not the primary failure in this fixture; they are currently nested one level too deep for the runtime compiler to see.
+
+Duration note: the supplied 24 shot durations sum to approximately 44.5 seconds. Current build logic clamps total duration to at least 60 seconds (line 412), independently of the nested-shot issue. This conflicts with the locked decision that 60 seconds is a default, not a hard minimum.
+
+## 7. Revised immediate implementation order
+
+1. Implement and unit-test the nested shot compiler first, preserving scene-level visual context and shot-level actions.
+2. Map the text object contract and graphics object contract explicitly.
+3. Move root-level crowd data into compiled shots/scenes according to a documented inheritance rule.
+4. Fix duration semantics so a valid explicit duration is honored and the default is 60 seconds only when no valid duration is supplied.
+5. Then run the supplied JSON as a regression fixture and verify each of its 24 shots is represented in the compiled timeline.
+6. Only after timeline compilation is correct, tune character posing, camera motion, visual effects, and subtitle layout.
+
+
+## 8. Safety and scope
 
 - Do not modify `main`.
 - Do not replace the application or rewrite the renderer.
