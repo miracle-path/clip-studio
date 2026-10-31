@@ -58,7 +58,8 @@ The first fixture placed the actor centers at x=0.36 and x=0.58 (0.22 canvas-wid
 - Boxer and zombie both face each other from the first frame (unless an explicit actor `face` overrides the inferred event pairing).
 - Boxer raises guard at 22% of the shot.
 - Boxer performs one punch; the arm extends toward the authored contact time (58%), then retracts by the recovery event.
-- Zombie begins a visibly stronger recoil/hit reaction at exactly 58%, facing the boxer; it must not react before 58%.
+- At 58%, the zombie should snap backward immediately as the punch reaches contact, with a brief whole-body displacement plus a stronger torso recoil; it must not react before 58%.
+- The initial knockback should be sharp and brief, then settle smoothly rather than looking like a delayed wobble.
 - Boxer returns to idle/recovery at 76%.
 - The punch should not repeat continuously just because time advances.
 
@@ -80,3 +81,11 @@ The first fixture placed the actor centers at x=0.36 and x=0.58 (0.22 canvas-wid
 ## Report back
 
 Please report whether the punch occurs once, whether the zombie reacts at the right time, and whether the facing direction looks correct. A short screen recording is more useful than a screenshot for timing problems.
+
+
+## Latest impact-response update — commit `51cc30a`
+
+- The human/zombie hit pose now has a stronger torso lean and rotation, with a short displacement away from the attacker during the first 18% of the reaction event.
+- The displacement is applied to the human/zombie render path before drawing the rig, so it affects the zombie in this fixture (not only other actor types).
+- The hit event still starts at the authored event time (58%); this change strengthens the visible response at that instant rather than moving the event earlier.
+- Static source inspection only. Browser playback and perceived sync still require user verification.
