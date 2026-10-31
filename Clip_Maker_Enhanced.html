@@ -324,7 +324,7 @@ function actors(list,t,lt,k,events){
   else if(act=='punch'){
    const u=a._eventPhase==null?null:clamp(a._eventPhase),cp=a._eventContact,
     reach0=u==null?null:(cp==null?Math.sin(Math.PI*u):u<=cp?((u/Math.max(.01,cp))<.62?.04:.04+.96*ez(((u/Math.max(.01,cp))-.62)/.38)):1-ez((u-cp)/Math.max(.01,1-cp))),
-    reach=reach0==null?null:Math.min(reach0,a._eventBlocked?.68:1),
+    reach=reach0==null?null:Math.min(reach0,a._eventBlocked?.34:1),
     aq=reach==null?.5+.5*Math.sin(t*7):reach;
    // One attack event is one punch: drive only the lead arm through a single wind-up/contact/retract arc.
    // Keep the rear arm in a stable guard so the pose cannot read as alternating multi-punches.
@@ -334,7 +334,7 @@ function actors(list,t,lt,k,events){
    lL=.28;lR=-.22;kb=.35;lean=.1+.08*aq;bob=-aq*6
   }
   else if(act=='guard'){aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=.05;bob=Math.sin(t*4)*3}
-  else if(act=='block'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=1.15;aR=1.45;bL=-.55;bR=-.85;lL=.08;lR=-.08;kb=.45;lean=-.04*q;bob=-2*q}
+  else if(act=='block'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=-.85;aR=.85;bL=1.4;bR=-1.4;lL=.08;lR=-.08;kb=.35;lean=-.035*q;bob=-2*q}
   else if(act=='dodge'){const dp=clamp(a._eventPhase??0),q=dp<.34?ez(dp/.34):dp<.62?1:1-ez((dp-.62)/.38);aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=-.28*q;rot=0;bob=-2*q}
   else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5)),recoil=1-ez(u);lean=-.78*recoil;rot=-.24*recoil;aL=-1.25;aR=-1.55;lL=.34;lR=-.22;bob=-7*recoil-Math.sin(Math.PI*Math.min(1,u*1.4))*9}
   else if(act=='ko'){const u=ez(clamp(k*3));rot=-1.45*u;dy=-20*u;aL=-.3;aR=-.5;lL=.1;lR=0}
