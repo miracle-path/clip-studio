@@ -171,3 +171,16 @@ Source correction committed as `451a5ae178976a7cfa73edd29589ce4354fb88c9` on `ph
 - Strengthen `hit` reaction with a clear torso recoil and body rotation that decay over the event phase.
 - Static verification: inline JavaScript syntax passed; isolated event evaluator confirmed zombie has no `hit` state at k=0.579 and enters `hit` at k=0.58.
 - Not verified: browser playback, visual hit/contact alignment, export parity. User must re-run the same 8-second fixture.
+
+
+## Defensive-action increment — implementation added
+
+Source commit: `451395ffa0ad9ec21b9d710c44799e61f1c870c2` (with the initial defensive-action implementation in the preceding commit).
+
+- Added event type `dodge` as its own action instead of mapping it to a vertical jump.
+- Added event type `block` as a distinct defensive pose; existing `guard` behavior remains unchanged.
+- Dodge uses normalized event phase for a short backward displacement and lean-away/recovery arc, so the same timestamp evaluates deterministically.
+- Block uses a compact forward forearm guard and restrained torso posture.
+- Added a dedicated Dodge + Block test fixture to `docs/PHASE_02_ACTION_EVENTS_TEST.md`.
+- Scope: currently implemented for the human/zombie procedural rig path. This is pose choreography, not collision detection or damage resolution.
+- Verification status: source-level edits and fixture consistency checked. Browser playback and visual contact alignment have not been tested by the maintainer; user verification is required.
