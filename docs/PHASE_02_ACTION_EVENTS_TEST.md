@@ -183,3 +183,27 @@ This fixture validates the first defensive-action increment on the existing huma
 4. Does the second punch read as being met by the guard rather than striking the torso?
 5. Does the boxer avoid the hit-recoil pose during the block?
 6. Does the original punch-only fixture still look exactly as good as the previously approved version?
+
+
+## Defensive-action retest — response timing, guard contact, punch rear arm
+
+Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
+
+### Changes under test
+
+- Dodge now uses a fast snap-out phase (first 16% of its event), holds the evade position, then returns during the final 32%. Backward displacement increased from 34 to 58 renderer pixels and the lean/recoil pose is stronger. The dodge event should begin after the opponent's attack starts but well before the authored contact time.
+- When an attack's target has a matching active `block` event at the attack contact time, draw order places the defender in front of the striker. This is a 2D visual occlusion approximation so the forearms can cover the incoming glove; it is not a collision solver or damage system.
+- The puncher's non-striking arm now uses the same compact guard pose as the dedicated guard action instead of the previous folded-back angle pair. The lead-arm punch wind-up, contact timing, extension and retraction curve are unchanged.
+
+### Retest checklist
+
+1. Dodge starts after the punch begins, but clearly before the glove reaches the boxer.
+2. Dodge is a fast, decisive slip/backstep rather than a slow drift or vertical jump.
+3. Boxer holds the evade briefly, then returns smoothly without sliding.
+4. During the second punch, the boxer's forearms visibly sit in front of and obscure the incoming glove at contact (2D layering approximation).
+5. Zombie's non-striking arm stays in a compact guard and no longer folds into an odd pose.
+6. Previously approved punch remains one punch, with the same wind-up, contact timing, visible glove and clean retraction.
+
+### Verification status
+
+Static source checks only. Inline JavaScript syntax and fixture JSON must be checked after edits; visual playback, dodge feel, block readability and the zombie arm pose still require user verification in a browser. Do not mark visual acceptance as PASS until user feedback confirms it.
