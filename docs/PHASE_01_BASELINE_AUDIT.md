@@ -114,3 +114,30 @@ Before changing renderer logic, provide a screenshot or copy/paste of the FIRST 
 6. If reload has no error, click Play once and copy the first red error.
 
 Do not send only the last error if multiple errors appear. The first exception is the priority because later failures may be cascading symptoms.
+
+
+## 7. Baseline retest update (user report, latest)
+
+Latest user-reported result: 5/10 passed.
+
+Passed:
+- Page opens normally.
+- Sample JSON loads.
+- Timeline changes scenes.
+- Pause and Stop reportedly work.
+- Video export reportedly works.
+
+Still failing:
+- Characters and scenes do not display completely.
+- Play animation does not work.
+- Camera and effects do not work.
+- Text and subtitles do not display correctly.
+- Console still has red errors (the clean-console check failed).
+
+### Reconciliation with static source
+
+The source file remains unchanged at blob SHA `fe0db957e262ff64ed0e29757ffa3566d862eb68` (102,974 bytes / 882 lines). Static inspection finds no Pause/pause markup or handler in this exact file. The Export handler does exist and uses MediaRecorder with a MIME fallback list, but does not include a recorder error handler or object-URL revocation. Therefore the latest reported Pause/Export passes are recorded as user-observed results, but they do not establish that a Pause control exists in this checked-in source or that export is robust across browsers. Confirm which exact local file/version was tested if a Pause control was visible.
+
+### Current priority
+
+Do not modify renderer behavior until the first Console exception is captured. The user's latest test still reports red Console errors, and the exact first error/stack is the missing diagnostic needed to identify the root cause. After obtaining it, reproduce the smallest failing path and patch only the proven cause.
