@@ -118,7 +118,7 @@ Do not send only the last error if multiple errors appear. The first exception i
 
 ## 7. Baseline retest update (user report, latest)
 
-Latest user-reported result: 5/10 passed.
+Latest user-reported result: 6/10 passed. The previous report incorrectly counted the Console check as failed; the user clarified that they forgot to tick the checkbox. Console has no red errors and is PASS.
 
 Passed:
 - Page opens normally.
@@ -132,7 +132,7 @@ Still failing:
 - Play animation does not work.
 - Camera and effects do not work.
 - Text and subtitles do not display correctly.
-- Console still has red errors (the clean-console check failed).
+- Console has no red errors (PASS; corrected by user).
 
 ### Reconciliation with static source
 
@@ -140,4 +140,9 @@ The source file remains unchanged at blob SHA `fe0db957e262ff64ed0e29757ffa3566d
 
 ### Current priority
 
-Do not modify renderer behavior until the first Console exception is captured. The user's latest test still reports red Console errors, and the exact first error/stack is the missing diagnostic needed to identify the root cause. After obtaining it, reproduce the smallest failing path and patch only the proven cause.
+Do not modify renderer behavior until the first Console exception is captured. The Console check is PASS. Do not request a Console error or treat Console errors as the current blocker. The remaining failures are visual completeness, animation playback, camera/effects, and text/subtitles. Reproduce these specific symptoms using the tested sample and inspect the corresponding source paths before patching.
+
+
+## 8. Correction: Console checkbox clarification
+
+The user clarified that they forgot to tick the Console checkbox in the previous 5/10 report. The Console has no red errors and must be counted as PASS. Corrected baseline total: 6/10. No Console error is currently reported; do not ask for a first Console error unless a new one appears.
