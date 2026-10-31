@@ -261,10 +261,38 @@ function beastActor(a,x,y,s,SC,pz,act,t,dir,name){
  ANCH[name]=wpt(145,-210);g.restore();
 }
 
+function evaluateActionEvents(list,events,k){
+ const states={};if(!Array.isArray(events)||!events.length)return states;
+ const valid=events.filter(e=>e&&Number.isFinite(+e.at)&&e.at>=0&&e.at<=1).slice().sort((a,b)=>a.at-b.at);
+ const ids=new Set((list||[]).map(a=>a.who||a.id).filter(Boolean));
+ for(let i=0;i<valid.length;i++){
+  const e=valid[i],id=e.actor;if(!id||!ids.has(id))continue;
+  const next=valid.slice(i+1).find(q=>q.actor===id),start=clamp(+e.at),fallbackEnd=Math.min(1,start+.28),end=Math.max(start+.001,Math.min(1,Number.isFinite(+e.end)?+e.end:(e.contact!=null?+e.contact:(next?+next.at:fallbackEnd))));
+  if(k<start)continue;
+  const phase=clamp((k-start)/(end-start));
+  const type=e.type,action=e.action;
+  let act=null;
+  if(type==='notice'||type==='turn'||type==='recover')act='idle';
+  else if(type==='approach')act='walk';
+  else if(type==='guard')act='guard';
+  else if(type==='attack')act=action||'punch';
+  else if(type==='dodge')act=action||'jump';
+  else if(type==='react')act=action||'hit';
+  else if(type==='hit')act=action||'hit';
+  else if(type==='fall')act=action||'ko';
+  else if(type==='celebrate')act=action||'cheer';
+  else if(type==='pickup'||type==='use_prop')act=action||'hold';
+  if(!act)continue;
+  states[id]={act,_eventPhase:phase};
+  const target=e.target||e.source;
+  if(target)states[id].face=target;
+ }
+ return states;
+}
 function actors(list,t,lt,k){
  const POS={},ord=[];for(const a0 of list||[]){let b={...(CAST[a0.who]||{}),...a0};if(b.keys)b=kf(b,k);const yy=b.y??(b.c=='fish'||b.c=='bird'?.4:.72);POS[b.who||b.id||b.c]={x:b.keys?b.x:lerp(b.x??.5,b.to??b.x??.5,clamp(k)),y:yy};ord.push([a0,yy])}
  ord.sort((p,q)=>p[1]-q[1]);POSG=POS;
- for(let a of ord.map(o=>o[0])){a={...(CAST[a.who]||{}),...a};if(a.keys)a=kf(a,k);
+ for(let a of ord.map(o=>o[0])){a={...(CAST[a.who]||{}),...a};if(a.keys)a=kf(a,k);a={...a,...(eventStates[a.who||a.id]||{})};
   {const nm=a.who||a.id||a.c,me=POS[nm];let tg=a.face?POS[a.face]:null;if(!tg&&!a.dir&&FIGHT[a.act]){let bd=9;for(const o in POS){if(o==nm||/^cr\d/.test(o))continue;const dd=Math.abs(POS[o].x-me.x);if(dd<bd){bd=dd;tg=POS[o]}}}if(tg&&me&&tg.x!==me.x)a.dir=tg.x<me.x?-1:1}
   if(a.svg){svgActor(a,t,k);continue}if(a.c=='fish'||a.c=='bird'||a.c=='blob'){critter(a,t,k);continue}if(a.c=='cat'||a.c=='dog'){cat4(a,t,k);continue}
   const ty=PAL[a.c]?a.c:'human',P=PAL[ty],act=a.act||'idle',s=a.s||1,x0=a.x??.5,mv=act=='walk'||act=='run',pet=ty=='cat'||ty=='dog';
@@ -275,9 +303,9 @@ function actors(list,t,lt,k){
   else if(act=='jump'){const u=Math.abs(Math.sin(t*3.2));dy=-u*200;aL=2.7;aR=-2.7;lL=u>.1?.4:0;lR=-lL;kb=u>.1?.9:0}
   else if(act=='wave'){aL=2.6+Math.sin(t*9)*.4;aR=-.15}
   else if(act=='dance'){bob=-Math.abs(Math.sin(ph))*10;lean=Math.sin(ph*.5)*.12;aL=2.4+Math.sin(ph)*.5;aR=-2.4-Math.sin(ph)*.5;lL=Math.sin(ph*.5)*.35;lR=-lL;kb=.3}
-  else if(act=='punch'){const q=Math.sin(t*7),aq=Math.abs(q);aL=q>0?1.6:2.3;bL=q>0?.15:1.9;aR=q<0?1.6:2.1;bR=q<0?.15:1.9;lL=.35;lR=-.3;kb=.35;lean=.1+.08*aq;bob=-aq*6}
+  else if(act=='punch'){const u=a._eventPhase==null?null:clamp(a._eventPhase),reach=u==null?null:(u<.55?ez(u/.55):1-ez((u-.55)/.45)),q=reach==null?Math.sin(t*7):reach*2-1,aq=reach==null?Math.abs(q):reach;aL=q>0?1.6:2.3;bL=q>0?.15:1.9;aR=q<0?1.6:2.1;bR=q<0?.15:1.9;lL=.35;lR=-.3;kb=.35;lean=.1+.08*aq;bob=-aq*6}
   else if(act=='guard'){aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=.05;bob=Math.sin(t*4)*3}
-  else if(act=='hit'){const u=clamp(k*2.5);lean=-.3*(1-u);aL=-.8;aR=-1.2;lL=.2;lR=-.2;bob=Math.sin(t*30)*3*(1-u)}
+  else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5));lean=-.3*(1-u);aL=-.8;aR=-1.2;lL=.2;lR=-.2;bob=Math.sin(t*30)*3*(1-u)}
   else if(act=='ko'){const u=ez(clamp(k*3));rot=-1.45*u;dy=-20*u;aL=-.3;aR=-.5;lL=.1;lR=0}
   else if(act=='kick'){const q=Math.sin(t*6);lL=q>0?1.4:.3;lR=-.2;aL=-.6;aR=1.0;lean=-.15}
   else if(act=='sit'){dy=130;lL=1.5;lR=1.5;kb=.1;aL=.5;aR=-.2}
@@ -735,7 +763,7 @@ function frame(time){
  let fx=clamp(lerp(A.x??.5,B.x??A.x??.5,e),.5/z,1-.5/z),fy=clamp(lerp(A.y??.5,B.y??A.y??.5,e),.5/z,1-.5/z);const sh=c.shake||0;if(c.follow&&POSG[c.follow]){const q=POSG[c.follow];fx=clamp(q.x,.5/z,1-.5/z);fy=clamp(q.y-.12,.5/z,1-.5/z)}
  g.save();g.translate(W/2,H/2);g.scale(z,z);g.rotate((c.roll||0)*Math.PI/180);g.translate(-fx*W+Math.sin(time*47)*sh,-fy*H+Math.cos(time*53)*sh);CAMI=g.getTransform().inverse();ANCH={};LT=sc.lt&&sc.lt[0]?{x:sc.lt[0].x*W}:null;GEO=sc.geo||null;
  if(c.dof)g.filter='blur('+Math.min(12,c.dof)+'px)';(THEMES[sc.theme]||custom)(time,sc);
- props(sc.props,time,k,true);g.filter='none';actors((sc.actors||(sc.char&&sc.char!='none'?[{c:sc.char=='person'?'human':sc.char,act:'walk',x:.3,to:.7}]:[])).concat(crowdOf(sc.crowd)),time,lt,k);
+ props(sc.props,time,k,true);g.filter='none';actors((sc.actors||(sc.char&&sc.char!='none'?[{c:sc.char=='person'?'human':sc.char,act:'walk',x:.3,to:.7}]:[])).concat(crowdOf(sc.crowd)),time,lt,k,sc.events);
  props(sc.props,time,k,false);lights(sc.lt,time);g.restore();atmos(sc.am,time);gfx(sc.gx,time,time-sc.gts,sc);
  if($('oSub').checked&&sc.tx)subtitle(sc.tx,sc.hl,clamp((time-sc.ts)/.3));
  let ov=0,col='0,0,0';if(tr=='fade')ov=1-tp;else if(tr=='flash'){ov=1-tp;col='255,255,255'}
