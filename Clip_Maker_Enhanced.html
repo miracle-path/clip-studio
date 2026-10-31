@@ -299,7 +299,7 @@ function actors(list,t,lt,k,events){
   {const nm=actorId,me=POS[nm];let tg=a.face?POS[a.face]:null;if(!tg&&!a.dir&&FIGHT[a.act]){let bd=9;for(const o in POS){if(o==nm||/^cr\d/.test(o))continue;const dd=Math.abs(POS[o].x-me.x);if(dd<bd){bd=dd;tg=POS[o]}}}if(tg&&me&&tg.x!==me.x)a.dir=tg.x<me.x?-1:1}
   if(a.svg){svgActor(a,t,k);continue}if(a.c=='fish'||a.c=='bird'||a.c=='blob'){critter(a,t,k);continue}if(a.c=='cat'||a.c=='dog'){cat4(a,t,k);continue}
   const ty=PAL[a.c]?a.c:'human',P=PAL[ty],act=a.act||'idle',s=a.s||1,x0=a.x??.5,mv=act=='walk'||act=='run',pet=ty=='cat'||ty=='dog';
-  const dir=a.dir||((a.to!=null&&a.to<x0)?-1:1),to=a.to??(mv?x0+dir*.3:x0),x=lerp(x0,to,clamp(k))*W,y=(a.y??.72)*H;
+  const dir=a.dir||((a.to!=null&&a.to<x0)?-1:1),to=a.to??(mv?x0+dir*.3:x0);let x=lerp(x0,to,clamp(k))*W;const y=(a.y??.72)*H;
   DIRS[a.who||a.id]=dir;const SC=.62*dep(y);if(ty=='robot'){robotActor(a,x,y,s,SC,{dy:0,bob:0,rot:0},act,t,dir,a.who||a.id||ty);continue}if(['wolf','lion','bear','horse','dinosaur','dragon','elephant','monster'].includes(a.c)){beastActor(a,x,y,s,SC,{dy:0,bob:0,rot:0},act,t,dir,a.who||a.id||ty);continue}const ph=t*({run:12,walk:7,dance:9}[act]||3);let bL,bR,bob=0,dy=0,lean=0,rot=0,aL=.15,aR=-.15,lL=0,lR=0,kb=0;
   if(act=='idle'){bob=Math.sin(t*2.5)*3;aL=.12+Math.sin(t*2.5)*.05;aR=-aL}
   else if(mv){const r=act=='run';bob=-Math.abs(Math.sin(ph))*(r?14:6);lean=r?.2:.05;lL=Math.sin(ph)*(r?1:.6);lR=-lL;aL=-lL*(r?1.1:.8);aR=-aL;kb=r?1:.5;if(ty=='zombie'){aL=1.5;aR=1.3}}
