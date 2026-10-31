@@ -129,9 +129,11 @@ Duration note: the supplied 24 shot durations sum to approximately 44.5 seconds.
 
 Source changes were committed to `phase-01-core`:
 - Commit `10201036f8b280405fdd6c541cecb4ecdd5a3253`: flatten nested `scenes[].shots[]`, preserve parent scene context, map `dur` to timeline weight, convert `text.t/text.h` into renderer text/highlight fields, apply root crowd data, infer total duration from valid shot durations, and remove the hard 60-second clamp in favor of UI duration → JSON duration → 60-second default.
-- Commit `916b1ad3314d816484d9b493fdde6f3804781d3f`: ensure inherited object-form text is normalized too.
-- Latest source blob SHA at time of verification: `fd85bc52481e625872f2a13d33193883fbbebd7b`.
-- Latest source size/shape before the final one-line condition correction: 104,184 bytes / 905 lines. The final correction changes only the condition text; re-fetch is required for the exact final byte/line count.
+- Commit `916b1ad3314d816484d9b493fdde6f3804781d3f`: begin normalizing object-form text; a follow-up corrected the merged/inherited text reference.
+- Latest source commit: `d702bccc5a8fd846c6e9d17bc32f757d95977eea`.
+- Latest source blob SHA: `cd829dc4f7aaf217738677b245f1abc0f5967879`.
+- Latest source size/shape: 104,189 bytes / 906 lines.
+
 
 **Verification status:** source was re-fetched after commits and the modified normalization/build sections were inspected. This is static source verification only. No browser playback, pixel comparison, console test, or export test has been run. Do not mark the user's four failed baseline tests as passed yet.
 
