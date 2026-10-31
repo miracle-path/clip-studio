@@ -5,10 +5,10 @@
 |---|---|
 | Status | Phase 00 — Blueprint / design baseline |
 | Date | 2026-10-31 |
-| Repository | \`miracle-path/clip-studio\` |
-| Primary application | \`Clip_Maker_Enhanced.html\` |
-| Audited baseline branch | \`main\` |
-| Audited baseline commit | \`d02793fb568414fc8c545e557ac7fc4b124b86c6\` |
+| Repository | `miracle-path/clip-studio` |
+| Primary application | `Clip_Maker_Enhanced.html` |
+| Audited baseline branch | `main` |
+| Audited baseline commit | `d02793fb568414fc8c545e557ac7fc4b124b86c6` |
 | Baseline file size | 102,974 bytes |
 | Baseline file length | 882 lines |
 | Runtime target | Single HTML file; Vanilla JavaScript; Canvas 2D + SVG |
@@ -67,7 +67,7 @@ These constraints are mandatory unless the user explicitly changes them.
 | Export strategy | First make realtime MediaRecorder export robust. Design boundaries so frame-accurate export can be added later. |
 | Photo / stylize system | Defer until the core engine is stable; it must not block animation, characters, or world rendering. |
 | Browser support | Chrome and Edge are primary. Other browsers are best-effort with feature detection and graceful fallback. |
-| AI integration | Keep manual JSON fallback. Host-specific \`claude.use('sample')\` must remain behind an adapter. |
+| AI integration | Keep manual JSON fallback. Host-specific `claude.use('sample')` must remain behind an adapter. |
 | Rendering | Canvas 2D remains the primary renderer; SVG remains available for vector actors/assets. |
 | Architecture style | Incremental namespaced modules inside the single script; do not rely on an external sidecar monkey-patching closed-over state. |
 
@@ -77,13 +77,13 @@ These constraints are mandatory unless the user explicitly changes them.
 
 ### 4.1 Verified repository baseline
 
-The current \`main\` branch source was fetched directly from GitHub during this audit.
+The current `main` branch source was fetched directly from GitHub during this audit.
 
-- File: \`Clip_Maker_Enhanced.html\`
-- Commit: \`d02793fb568414fc8c545e557ac7fc4b124b86c6\`
+- File: `Clip_Maker_Enhanced.html`
+- Commit: `d02793fb568414fc8c545e557ac7fc4b124b86c6`
 - Size: 102,974 bytes
 - Lines: 882
-- Script form: classic inline \`<script>\`, not an ES module.
+- Script form: classic inline `<script>`, not an ES module.
 
 The older Architecture Review document reports 130,657 bytes / 881 lines in its header. That metadata does not match the current fetched file. The source commit and live file are the baseline authority for implementation.
 
@@ -104,17 +104,17 @@ These are valuable assets. The initial work should improve data flow and control
 
 | ID | Finding | Impact | Planned phase |
 |---|---|---|---|
-| BASE-01 | \`normalizeSceneData()\` inserts theme / sky / ground / atmosphere defaults before \`build()\` inheritance. | A later scene can lose continuity and fall back to a new default environment. | Core Architecture |
-| BASE-02 | \`build()\` and the render loop lack complete fault isolation. | Invalid input or a drawing exception can stop playback without a useful error. | Core Architecture |
-| BASE-03 | \`frame(time)\` depends on mutable globals such as \`POSG\`, \`DIRS\`, \`ANCH\`, \`CAMI\`, \`LT\`, and \`GEO\`. | Seeking and repeated renders may not produce the same frame. | Core Architecture → Animation Core |
-| BASE-04 | Timeline selection uses a linear \`findIndex\`; end-of-timeline and out-of-range handling is fragile. | Boundary frames can resolve to the wrong scene. | Animation Core |
-| BASE-05 | Duration is forced by \`Math.max(60, ...)\`. | Short clips cannot be authored or previewed. | Core Architecture |
+| BASE-01 | `normalizeSceneData()` inserts theme / sky / ground / atmosphere defaults before `build()` inheritance. | A later scene can lose continuity and fall back to a new default environment. | Core Architecture |
+| BASE-02 | `build()` and the render loop lack complete fault isolation. | Invalid input or a drawing exception can stop playback without a useful error. | Core Architecture |
+| BASE-03 | `frame(time)` depends on mutable globals such as `POSG`, `DIRS`, `ANCH`, `CAMI`, `LT`, and `GEO`. | Seeking and repeated renders may not produce the same frame. | Core Architecture → Animation Core |
+| BASE-04 | Timeline selection uses a linear `findIndex`; end-of-timeline and out-of-range handling is fragile. | Boundary frames can resolve to the wrong scene. | Animation Core |
+| BASE-05 | Duration is forced by `Math.max(60, ...)`. | Short clips cannot be authored or previewed. | Core Architecture |
 | BASE-06 | Keyframe interpolation supports only a small set of fields and uses a single hard-coded easing curve. | Limited timing control and abrupt action changes. | Animation Core |
 | BASE-07 | Character action behavior is embedded in renderers and is mostly procedural sine motion rather than a unified motion state model. | Weak transitions, inconsistent action timing, and difficult species-specific upgrades. | Animation Core → Character Engine |
 | BASE-08 | Camera follow reads actor positions from mutable state populated during actor drawing. | Follow can lag by a frame and is sensitive to render order. | Animation Core / Cinematic Engine |
-| BASE-09 | \`Math.random()\` is used during rendering. | Re-rendering the same time can change visual output. | World / Cinematic / QA |
+| BASE-09 | `Math.random()` is used during rendering. | Re-rendering the same time can change visual output. | World / Cinematic / QA |
 | BASE-10 | Asset loading is not fully awaited before playback/export. | SVG/image assets can be absent in early frames. | World / QA & Export |
-| BASE-11 | \`subtitle()\` and \`crowdOf()\` perform avoidable work during frame rendering. | Unnecessary allocations and repeated text measurement. | Core Architecture / QA |
+| BASE-11 | `subtitle()` and `crowdOf()` perform avoidable work during frame rendering. | Unnecessary allocations and repeated text measurement. | Core Architecture / QA |
 | BASE-12 | The prompt, aliases, and painter support lists are separate sources of truth. | AI may request unsupported actions or fields. | AI Director |
 | BASE-13 | MediaRecorder export is realtime and has no captured speech audio. | Export depends on tab scheduling; TTS is not embedded in the video. | QA & Export |
 
@@ -122,12 +122,12 @@ These are valuable assets. The initial work should improve data flow and control
 
 The source is a classic script, so top-level function declarations and top-level lexical declarations do not have identical exposure behavior.
 
-- Functions such as \`frame\` and \`kf\` are declared as top-level function declarations.
-- State such as \`scenes\`, \`total\`, \`DIRS\`, \`POSG\`, \`ANCH\`, \`GEO\`, and constants such as \`THEMES\` are declared with \`let\` / \`const\` and must not be assumed to exist as \`window.*\` properties.
-- A prototype that reads \`window.scenes\` or \`window.DIRS\` is therefore not a safe integration strategy.
-- Adding \`window.AnimCore\` alone does not create a reliable hook into lexical state or change the wall-clock behavior of the current \`loop()\`.
+- Functions such as `frame` and `kf` are declared as top-level function declarations.
+- State such as `scenes`, `total`, `DIRS`, `POSG`, `ANCH`, `GEO`, and constants such as `THEMES` are declared with `let` / `const` and must not be assumed to exist as `window.*` properties.
+- A prototype that reads `window.scenes` or `window.DIRS` is therefore not a safe integration strategy.
+- Adding `window.AnimCore` alone does not create a reliable hook into lexical state or change the wall-clock behavior of the current `loop()`.
 - Rendering a previous and current frame twice on the same canvas is not a safe crossfade strategy: the frame function clears/draws the canvas and mutates shared render state.
-- Applying \`globalAlpha\` around one renderer does not blend two different poses; both poses must actually be evaluated and drawn.
+- Applying `globalAlpha` around one renderer does not blend two different poses; both poses must actually be evaluated and drawn.
 
 **Architecture decision:** introduce explicit module interfaces and state ownership through controlled edits to the existing source. Do not make the production engine depend on speculative monkey-patching.
 
@@ -149,7 +149,7 @@ The source is a classic script, so top-level function declarations and top-level
 
 **Items not to copy without correction**
 
-- The sidecar's assumptions about \`window.scenes\`, \`window.total\`, and other lexical bindings.
+- The sidecar's assumptions about `window.scenes`, `window.total`, and other lexical bindings.
 - Fixed-step clock code that is not actually connected to the player loop.
 - Crossfade code that renders two full frames into the same mutable canvas.
 - Pose blending that changes alpha but does not evaluate and draw both poses.
@@ -174,7 +174,7 @@ The supplied Gemini HTML is a reference prototype, not a production module ready
 
 Its actual behavior is narrower than its specification:
 
-- The documented contract uses \`scenes[]\`, while the sample UI payload uses a singular \`scene\` object.
+- The documented contract uses `scenes[]`, while the sample UI payload uses a singular `scene` object.
 - Applying JSON only reads a few scene-level values (theme, camera preset, shake, VFX density); it does not render the supplied cast, actors, positions, lighting sources, environment elements, or VFX definitions from the full contract.
 - Character and animation selectors update a small set of renderer flags; the supplied actor records do not drive a full actor timeline.
 - The human, robot, quadruped, and monster drawings are illustrative primitive rigs, not the described joint hierarchy / analytical IK engine.
@@ -193,7 +193,7 @@ Its actual behavior is narrower than its specification:
 
 ### 6.1 Data flow
 
-\`\`\`text
+```text
 AI / Manual JSON (v1)
         |
         v
@@ -219,30 +219,30 @@ AI / Manual JSON (v1)
         |
         v
   Preview / Seek / Realtime Export
-\`\`\`
+```
 
 ### 6.2 Module boundaries
 
-All modules remain inside the same HTML script. The \`CM\` namespace is the planned internal boundary; it is introduced incrementally.
+All modules remain inside the same HTML script. The `CM` namespace is the planned internal boundary; it is introduced incrementally.
 
 | Module | Owns | Must not own |
 |---|---|---|
-| \`CM.util\` | Math, easing, seeded RNG, stable helpers | DOM, Canvas |
-| \`CM.schema\` | Enums, aliases, field rules, limits, defaults, capability metadata | Rendering |
-| \`CM.normalize\` | v1 aliases and structural normalization | Defaults, timeline state |
-| \`CM.validate\` | Input validation and issue reporting | Canvas, playback |
-| \`CM.compile\` | Inheritance, defaults, resolved timeline, immutable runtime project | DOM, Canvas |
-| \`CM.evaluate\` | Time → actor poses, camera target, scene state, action-local progress | DOM, Canvas, mutable globals |
-| \`CM.animation\` | Clock, timeline resolution, keyframe evaluation, motion state, optional physics | Painter implementation |
-| \`CM.character\` | Species rigs, pose evaluation, anchors, renderer adapters | Timeline ownership |
-| \`CM.world\` | Themes, parallax layers, decor, light/environment state | Player clock |
-| \`CM.cinematic\` | Camera path, focus, shake, transitions, post-effects | Data validation |
-| \`CM.renderer\` | Canvas state, render context, draw ordering, painter calls | UI controls |
-| \`CM.player\` | Play, pause, stop, seek, requestAnimationFrame, error boundary | Painter internals |
-| \`CM.ai\` | Prompt generation and host adapter | Rendering |
-| \`CM.exporter\` | Asset readiness, MediaRecorder, output lifecycle | Scene authoring |
-| \`CM.ui\` | DOM, panels, buttons, editor, messages | Animation math |
-| \`CM.selftest\` | Deterministic unit / integration / capability tests | Production state mutation |
+| `CM.util` | Math, easing, seeded RNG, stable helpers | DOM, Canvas |
+| `CM.schema` | Enums, aliases, field rules, limits, defaults, capability metadata | Rendering |
+| `CM.normalize` | v1 aliases and structural normalization | Defaults, timeline state |
+| `CM.validate` | Input validation and issue reporting | Canvas, playback |
+| `CM.compile` | Inheritance, defaults, resolved timeline, immutable runtime project | DOM, Canvas |
+| `CM.evaluate` | Time → actor poses, camera target, scene state, action-local progress | DOM, Canvas, mutable globals |
+| `CM.animation` | Clock, timeline resolution, keyframe evaluation, motion state, optional physics | Painter implementation |
+| `CM.character` | Species rigs, pose evaluation, anchors, renderer adapters | Timeline ownership |
+| `CM.world` | Themes, parallax layers, decor, light/environment state | Player clock |
+| `CM.cinematic` | Camera path, focus, shake, transitions, post-effects | Data validation |
+| `CM.renderer` | Canvas state, render context, draw ordering, painter calls | UI controls |
+| `CM.player` | Play, pause, stop, seek, requestAnimationFrame, error boundary | Painter internals |
+| `CM.ai` | Prompt generation and host adapter | Rendering |
+| `CM.exporter` | Asset readiness, MediaRecorder, output lifecycle | Scene authoring |
+| `CM.ui` | DOM, panels, buttons, editor, messages | Animation math |
+| `CM.selftest` | Deterministic unit / integration / capability tests | Production state mutation |
 
 ### 6.3 Runtime contract
 
@@ -272,7 +272,7 @@ All modules remain inside the same HTML script. The \`CM\` namespace is the plan
 
 Initial action vocabulary remains compatible with the existing renderer:
 
-\`idle, walk, run, jump, wave, dance, float, cheer, point, hold, pull, cast, channel, punch, guard, hit, ko, kick, sit, sleep, swim, fly\`
+`idle, walk, run, jump, wave, dance, float, cheer, point, hold, pull, cast, channel, punch, guard, hit, ko, kick, sit, sleep, swim, fly`
 
 Action definitions must declare:
 
@@ -422,8 +422,8 @@ The user-defined order is authoritative. A phase may contain multiple small comm
 ### Phase 01 — Core Architecture
 
 **Scope:**
-- Establish \`CM\` namespace and module boundaries inside the single HTML file.
-- Add capability detection and safe fallbacks for \`roundRect\`, \`ctx.filter\`, fonts, MediaRecorder, and related browser APIs.
+- Establish `CM` namespace and module boundaries inside the single HTML file.
+- Add capability detection and safe fallbacks for `roundRect`, `ctx.filter`, fonts, MediaRecorder, and related browser APIs.
 - Add build / render / player error boundaries with clear Thai error messages.
 - Separate authored data, normalized data, and compiled scene timing.
 - Fix inheritance ordering: normalize aliases first, inherit authored values second, apply defaults last.
@@ -585,7 +585,7 @@ These fixtures are permanent regression assets. They should remain small, determ
 
 ## 14. Git & Release Workflow
 
-1. Keep \`main\` as the stable baseline.
+1. Keep `main` as the stable baseline.
 2. Implement each phase on its own branch.
 3. Make small commits with one coherent purpose.
 4. Never update the same file concurrently through multiple write operations.
@@ -593,7 +593,7 @@ These fixtures are permanent regression assets. They should remain small, determ
 6. Run static checks and available automated tests before requesting browser validation.
 7. Do not merge a phase until its acceptance gate is reviewed.
 8. Keep the source file and this blueprint aligned; update the blueprint only when a decision or phase boundary actually changes.
-9. At the end of each phase, update \`HANDOFF.md\` with:
+9. At the end of each phase, update `HANDOFF.md` with:
    - repository / branch / commit SHA,
    - files changed,
    - implementation summary,
@@ -606,7 +606,7 @@ These fixtures are permanent regression assets. They should remain small, determ
 
 ## 15. Immediate Next Step — Phase 01 Core Architecture
 
-Phase 01 must begin with a fresh fetch of \`main\` and a new implementation branch based on the current stable commit.
+Phase 01 must begin with a fresh fetch of `main` and a new implementation branch based on the current stable commit.
 
 Recommended bounded work order:
 
