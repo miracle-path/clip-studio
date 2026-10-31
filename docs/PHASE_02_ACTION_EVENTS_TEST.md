@@ -50,12 +50,18 @@ Verify the first incremental Action Event implementation on top of the Phase 01 
 
 ## What should be visible
 
-- Boxer initially stands facing the zombie.
+- Boxer and zombie both face each other from the first frame (unless an explicit actor `face` overrides the inferred event pairing).
 - Boxer raises guard at 22% of the shot.
 - Boxer performs one punch; the arm extends toward the authored contact time (58%), then retracts by the recovery event.
-- Zombie begins its hit reaction at 58%, facing the boxer.
+- Zombie begins a visibly stronger recoil/hit reaction at exactly 58%, facing the boxer; it must not react before 58%.
 - Boxer returns to idle/recovery at 76%.
 - The punch should not repeat continuously just because time advances.
+
+## Latest source update — commit `451a5ae`
+
+- Event-linked opponents now infer their initial facing direction from the first `target` / `source` relationship, so the zombie should face the boxer before the reaction event begins. An explicit actor-level `face` remains authoritative.
+- The `hit` pose now uses a stronger torso recoil and body rotation that decays over the reaction event, instead of the previous subtle lean and time-based shake.
+- Source-level checks confirm the zombie has no `hit` state at k=0.579 and enters `hit` at k=0.58. JavaScript inline-script syntax check passed. Browser playback and visual timing still require user verification.
 
 ## Known limitations of this first increment
 
