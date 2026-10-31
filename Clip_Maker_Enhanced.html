@@ -334,7 +334,7 @@ function actors(list,t,lt,k,events){
    lL=.28;lR=-.22;kb=.35;lean=.1+.08*aq;bob=-aq*6
   }
   else if(act=='guard'){aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=.05;bob=Math.sin(t*4)*3}
-  else if(act=='block'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=-1.1;aR=1.1;bL=3.95;bR=-3.95;lL=.08;lR=-.08;kb=.35;lean=-.035*q;bob=-2*q}
+  else if(act=='block'||act=='blockFront'){const q=Math.sin(Math.PI*clamp(a._eventPhase??.5));aL=-1.1;aR=1.1;bL=3.95;bR=-3.95;lL=.08;lR=-.08;kb=.35;lean=-.035*q;bob=-2*q}
   else if(act=='dodge'){const dp=clamp(a._eventPhase??0),q=dp<.34?ez(dp/.34):dp<.62?1:1-ez((dp-.62)/.38);aL=2.3;aR=2.1;bL=bR=1.9;lL=.35;lR=-.3;kb=.35;lean=-.28*q;rot=0;bob=-2*q}
   else if(act=='hit'){const u=clamp(a._eventPhase??(k*2.5)),recoil=1-ez(u);lean=-.78*recoil;rot=-.24*recoil;aL=-1.25;aR=-1.55;lL=.34;lR=-.22;bob=-7*recoil-Math.sin(Math.PI*Math.min(1,u*1.4))*9}
   else if(act=='ko'){const u=ez(clamp(k*3));rot=-1.45*u;dy=-20*u;aL=-.3;aR=-.5;lL=.1;lR=0}
@@ -352,10 +352,16 @@ function actors(list,t,lt,k,events){
   const leg=(an,kn)=>{const [kx,ky]=seg(0,hy,an,66,26,LC),[fx,fy]=seg(kx,ky,an-kn,66,24,LC);g.fillStyle=pet?P.bot:'#222';g.beginPath();g.ellipse(fx+9,fy,18,10,0,0,7);g.fill()};
   const arm=an=>{const [ex,ey]=seg(0,-218,an,42,18,AC),[hx,hh]=seg(ex,ey,an+(act=='run'?1:.3),40,16,AC);g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hh,11,0,7);g.fill();if(an===aL)ANCH[a.who||a.id||ty]=wpt(hx,hh)};
   const blockArm=side=>{const sx=side*25,ex=side*55,hx=side*39,hy=-263;g.strokeStyle=AC;g.lineCap='round';g.lineJoin='round';g.lineWidth=17;g.beginPath();g.moveTo(sx,-216);g.quadraticCurveTo(side*43,-218,ex,-235);g.quadraticCurveTo(side*51,-251,hx,hy);g.stroke();g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(hx,hy,11,0,7);g.fill()};
+   const sideBlockArms=()=>{const glove=(x,y)=>{g.fillStyle=ty=='robot'?'#5f6b80':AC;g.beginPath();g.arc(x,y,11,0,7);g.fill()};g.strokeStyle=AC;g.lineCap='round';g.lineJoin='round';g.lineWidth=17;
+    // Rear arm stays tucked across the upper chest instead of mirroring the lead arm.
+    g.beginPath();g.moveTo(-18,-216);g.quadraticCurveTo(-36,-222,-30,-242);g.quadraticCurveTo(-26,-252,-12,-253);g.stroke();glove(-12,-253);
+    // Lead arm shields the face from the front; its elbow remains forward of the torso.
+    g.beginPath();g.moveTo(18,-216);g.quadraticCurveTo(38,-219,43,-235);g.quadraticCurveTo(47,-248,35,-260);g.stroke();glove(35,-260);
+   };
   leg(lR,kR);
   if(ty=='cat'){g.strokeStyle=T;g.lineWidth=16;g.lineCap='round';g.beginPath();g.moveTo(-28,-150);g.quadraticCurveTo(-100,-170,-85,-230+Math.sin(t*4)*18);g.stroke()}
   g.save();g.translate(0,hy);g.rotate(lean);g.translate(0,-hy);
-  if(act!=='block')arm(aR);g.fillStyle=T;rr(-34,-228,68,100,22);g.fill();
+  if(act!=='block'&&act!=='blockFront')arm(aR);g.fillStyle=T;rr(-34,-228,68,100,22);g.fill();
   if(ty=='human'||ty=='zombie'){g.fillStyle=P.bot;rr(-34,-160,68,32,12);g.fill()}
   const hx=6,hc=-272;g.fillStyle=ty=='astronaut'?P.skin:HC;
   if(ty=='robot'){rr(hx-42,hc-38,84,76,14);g.fill();g.strokeStyle=P.bot;g.lineWidth=5;g.beginPath();g.moveTo(hx,hc-38);g.lineTo(hx,hc-62);g.stroke();g.fillStyle='#ff4a45';g.beginPath();g.arc(hx,hc-66,7,0,7);g.fill();g.fillStyle='#4de1ff';g.beginPath();g.arc(hx-8,hc-4,9,0,7);g.arc(hx+22,hc-4,9,0,7);g.fill()}
@@ -371,7 +377,7 @@ function actors(list,t,lt,k,events){
     if(pet){g.fillStyle='#e87a90';g.beginPath();g.arc(hx+22,hc+2,5,0,7);g.fill()}
    }
   }
-  if(act=='block'){blockArm(-1);blockArm(1)}else arm(aL);g.restore();leg(lL,kL);g.restore();
+  if(act=='block'){sideBlockArms()}else if(act=='blockFront'){blockArm(-1);blockArm(1)}else arm(aL);g.restore();leg(lL,kL);g.restore();
  }
 }
 function actorsEmoji(list,t,lt){
@@ -718,7 +724,7 @@ function ring(t){
  g.fillStyle='#8a1f2a';g.fillRect(-40,1040,W+80,70);g.fillStyle='rgba(255,255,255,.18)';g.fillRect(-40,1040,W+80,6);
 }
 
-const FIGHT={punch:1,guard:1,hit:1,ko:1,kick:1};
+const FIGHT={punch:1,guard:1,block:1,blockFront:1,hit:1,ko:1,kick:1};
 const GR={grass:['#3c7a3a','#2a5a2c'],sand:['#d8bf8a','#b99b62'],snow:['#eef3f8','#c9d4e3'],wood:['#8a5a34','#5e3a1f'],tile:['#cfd3d8','#9aa0aa'],road:['#2b2b33','#17171d'],water:['#2a6f9e','#123a5a'],track:['#c4553a','#8f3a26'],dark:['#2a2a38','#14141c']};
 function decor(d,t,hz){
  const x=(d.x??.5)*W,y=(d.y??.69)*H,s=d.s||1,c=d.col,k=d.k;
@@ -861,7 +867,7 @@ function promptText(st){
 '## อิสระด้านเรื่องราว: เลือกแนว (ตลก ลึกลับ สารคดี ข่าว ดราม่า ผจญภัย ความรู้ ฯลฯ) โทน โครงเรื่อง สถานที่ และจังหวะเองให้เหมาะกับไอเดียนี้ ห้ามใช้โครงสำเร็จรูปเดิมซ้ำ (เปิดเหตุการณ์ → ลุกลาม → สรุป) ลองเปิดกลางเหตุการณ์ เล่าย้อน นับถอยหลัง ยกระดับทีละขั้น มุกเข้าใจผิด เฉลยตอนท้าย จบวน จบเงียบ จบด้วยมุก ปรับจังหวะช้า-เร็วตามอารมณ์ ไม่ต้องมีฉากสรุปเสมอไป',
 '## สัดส่วนสมจริง: ระบบย่อ/ขยายตัวละครตามความลึกเอง (y 0.55=ไกลเล็ก 0.9=ใกล้ใหญ่) สัตว์ถูกกำหนดขนาดจริงให้แล้ว ใช้ s=1 เป็นปกติ อย่าขยาย s ให้ตัวใหญ่ผิดสัดส่วน ใช้ซูมกล้องแทน คนที่ยืนหน้าฉากใช้ y 0.65-0.85',
 '## ตรรกะการกระทำและสถานที่ (สำคัญมาก): act ต้องตรงกับกริยาในบทเป๊ะ ชกมวย=punch (ผู้ถูกชก guard แล้ว hit แล้ว ko ใช้ keys เปลี่ยน act กลางช็อต) ตั้งการ์ด=guard ล้ม/น็อก=ko เตะ=kick นั่งพื้น=sit วิ่ง=run ดีใจ=cheer jump ใช้เฉพาะเมื่อบทให้กระโดดจริง ห้ามใช้ act ผิดความหมาย; สัตว์ที่ทำท่าแบบคน: จิงโจ้ c:"kangaroo" (gloves:true เมื่อสวมนวม) ห้ามใช้ human แทนสัตว์; ของและสถานที่เฉพาะกิจกรรมต้องมีในภาพ (มวย=theme "ring" มีเชือกและเวที ตกปลา=lake+rod); สถานที่ที่ไม่มีใน theme ให้สร้างเอง: theme "custom" + assets SVG เต็มจอ (viewBox 0 0 720 1280) วางด้วย props {p:"img",id,x:0.5,y:1,w:1,back:true} เส้นพื้นที่ตัวละครยืนอยู่ประมาณ y 0.65-0.85 ของภาพ',
-'act ของมนุษย์/ซอมบี้/จิงโจ้เพิ่ม: punch guard hit ko kick sit; theme เพิ่ม: ring (เวทีมวย/สนามประลอง)',
+'act ของมนุษย์/ซอมบี้/จิงโจ้เพิ่ม: punch guard block (การ์ด/บล็อกมุมข้าง: แขนหน้าใช้บังใบหน้า แขนหลังหุบป้องกันลำตัว ไม่กางสมมาตร) blockFront (บล็อกหันหน้าตรง: ยกแขนสองข้างป้องกันใบหน้าแบบสมมาตร) hit ko kick sit; theme เพิ่ม: ring (เวทีมวย/สนามประลอง)',
 '## ตัวละครสร้างเองได้ทุกแบบ (ใช้กับทุกไอเดีย): (1) มนุษย์ ฮีโร่ ยักษ์ ใช้ c:"human" (หรือ zombie); หุ่นยนต์ใช้ c:"robot" โดยเฉพาะ ห้ามใช้ human แทน robot; มอนสเตอร์เฉพาะชนิดใช้ c:"monster" หรือชนิดสัตว์ประหลาดที่ตรง ร่วมกับ build (0.7 ผอม ถึง 1.8 ล่ำบึ้ก) h (ความสูง 0.5-1.8) skin (สีผิว hex เช่นเขียว) col (สีเสื้อ) bot (สีกางเกง) shirtless:true suit:true (ชุดรัดรูปคลุมทั้งตัว ใช้สี col/bot) mask:"#hex" (หน้ากากเต็มหน้า) cape:"#hex" hat:"cap|helmet|crown|hood" horns:true glasses:true beard:true gloves:true; (2) สัตว์ที่มี renderer: cat dog kangaroo fish bird wolf lion bear horse dinosaur dragon elephant monster; ใช้ชนิดให้ตรงกับสิ่งมีชีวิต ห้ามแปลงเป็นคนหรือ blob; (3) สิ่งมีชีวิต/ยานพาหนะ/วัตถุอื่นทุกชนิด: เขียน SVG ด้านข้างหันขวาใน assets แล้วใช้ actors {svg:"id",w:ความกว้างสัดส่วนจอ 0.15-0.5,act:walk|run|jump|idle|float|ko,x,y,to} ; ห้ามใช้ blob แทนตัวละครที่ควรมีรูปร่างเฉพาะ; ถ้าไอเดียอ้างตัวละครมีลิขสิทธิ์หรือแบรนด์ ให้ออกแบบเป็นตัวละครแนวใกล้เคียงที่เป็นของเราเองด้วยพารามิเตอร์ ไม่ลอกโลโก้หรือเครื่องหมายการค้า',
 '## ฉากสร้างเองได้ทุกแบบ: ทุก scene ต้องมีสถานที่ที่มองเห็นได้จริง ไม่ใช่แค่ sky gradient กับพื้นเรียบ; ต้องใส่ decor อย่างน้อย 4-8 ชิ้น หรือ assets SVG ที่วาดจริง พร้อม foreground/midground/background และ parallax; ห้ามใช้ฉาก city/room/nature/road ซ้ำแบบสำเร็จรูปเมื่อบทระบุสถานที่เฉพาะ ต้องออกแบบตามสถานที่จริงในบทก่อนเสมอ ระบุสถาปัตยกรรม วัสดุ ป้าย เฟอร์นิเจอร์ ภูมิประเทศ แสง สภาพอากาศ และพร็อพที่บ่งบอกสถานที่; ใช้ SVG assets หลายชิ้นเป็นฉากหลังแยกชั้นเมื่อ decor ไม่พอ; theme "custom" + assets SVG เต็มจอสำหรับฉากที่มีเอกลักษณ์ (อาคาร/ภูมิประเทศ/พร็อพหลักต้องวาดเป็นชั้นหน้า-กลาง-หลัง) + sky:[บน,ล่าง hex] + ground:(grass|sand|snow|wood|tile|road|water|track|dark หรือสี hex) + hz (เส้นขอบฟ้า 0-1 ปกติ 0.69) + decor:[{k:"tree|pine|building|mountain|cloud|sun|moon|lamp|fence|flag|stands|finish|box|circle|star",x,y (ฐาน 0-1),s,col,w,h,n,front:true (วาดทับตัวละคร)}] ประกอบฉากเฉพาะเรื่องได้ เช่น สนามวิ่งเร็ว = ground:"track" + decor stands + finish + flag ตัวละครยืนบนพื้นที่ y 0.72-0.85 (ใต้ hz)',
 '## การโต้ตอบ: ตัวละครที่โต้ตอบกัน (ชก คุย แข่ง จ้องกัน) ใส่ face:"ชื่ออีกฝ่าย" เพื่อหันหน้าหากัน (ท่าต่อสู้หันหาอีกฝ่ายอัตโนมัติ) วางตำแหน่ง x ห่างกันพอดี การแข่งวิ่งให้ใช้ y ต่างกันตามเลน (0.72/0.78/0.84) และ x กับ to ต่างกันตามความเร็วจริง ผู้ชนะถึงเส้นชัยก่อน',
