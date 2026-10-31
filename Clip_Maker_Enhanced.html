@@ -312,7 +312,7 @@ function actors(list,t,lt,k,events){
     aq=reach==null?.5+.5*Math.sin(t*7):reach;
    // One attack event is one punch: drive only the lead arm through a single wind-up/contact/retract arc.
    // Keep the rear arm in a stable guard so the pose cannot read as alternating multi-punches.
-   aL=lerp(2.3,1.35,aq);bL=lerp(-2.7,0,aq);
+   aL=lerp(2.05,1.52,aq);bL=lerp(-.85,0,aq);
    aR=2.55;bR=-1.95;
    lL=.28;lR=-.22;kb=.35;lean=.1+.08*aq;bob=-aq*6
   }
