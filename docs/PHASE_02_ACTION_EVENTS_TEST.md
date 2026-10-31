@@ -192,7 +192,7 @@ Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
 ### Changes under test
 
 - Dodge now starts at 37%, after the attack's visible extension begins (the attack event starts at 12%). The first punch contact is moved to 47% to leave a usable reaction window. The dodge retains the moderate 34 px backstep, compact arm guard and modest lean.
-- Fixed the block draw-order index: the defender is now actually drawn after (in front of) the striker during a matched block. Both forearms are redrawn over the torso as a visible shield. The matching attack receives an internal blocked flag and its lead-arm extension is capped at 68% at contact, preventing the glove from reaching the torso. This is a deterministic 2D contact approximation, not a general collision solver or damage system.
+- Fixed the block draw-order index: the defender is now actually drawn after (in front of) the striker during a matched block. Both forearms are redrawn over the torso as a visible shield. The matching attack receives an internal blocked flag and its lead-arm extension is capped at 56% at contact, preventing the glove from reaching the torso. This is a deterministic 2D contact approximation, not a general collision solver or damage system.
 - The puncher's non-striking arm remains in the compact guard pose. The approved single-punch wind-up/contact/retraction curve is unchanged for unblocked punches.
 
 ### Retest checklist
@@ -207,3 +207,5 @@ Patch source commit: `506d721a87b7658a97d50eb073d9c916085665a4`
 ### Verification status
 
 Static source checks only. Inline JavaScript syntax and fixture JSON must be checked after edits; visual playback, dodge feel, block readability and the zombie arm pose still require user verification in a browser. Do not mark visual acceptance as PASS until user feedback confirms it.
+
+- Latest block-pose refinement: replaced the shared-centerline angle pose with two independently drawn, mirrored guard arms. Each arm starts from its own left/right shoulder anchor, bends outward at the elbow, and brings the fist back beside the face. The block-only draw path is isolated; punch and dodge arm geometry are unchanged. This is a visual pose refinement, not physical collision detection.
