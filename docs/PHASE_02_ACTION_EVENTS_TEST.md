@@ -112,3 +112,10 @@ Please report whether the punch occurs once, whether the zombie reacts at the ri
 
 ### Punch elbow correction
 The lead-arm wind-up now bends with the elbow below the shoulder-to-fist line, rather than folding upward into an inverted V. At contact the forearm straightens near horizontal. Event timing and contact synchronization are unchanged.
+
+
+### Punch visibility and wind-up refinement
+- During an active authored `attack` event with a valid `target`, the striker is drawn after that target so the striking arm/glove is not hidden behind the target sprite.
+- The punch now holds a visibly cocked, rearward elbow position through the early approach, then accelerates through the final 38% before authored contact.
+- The lead arm transitions from a bent, pulled-back wind-up to a near-horizontal straight extension at contact, then retracts after contact.
+- Contact timing and event contact coordinates are unchanged. Visual overlap ordering affects the striker/target actor draw order during the active attack only.
