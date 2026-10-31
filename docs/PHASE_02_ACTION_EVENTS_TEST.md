@@ -89,3 +89,11 @@ Please report whether the punch occurs once, whether the zombie reacts at the ri
 - The displacement is applied to the human/zombie render path before drawing the rig, so it affects the zombie in this fixture (not only other actor types).
 - The hit event still starts at the authored event time (58%); this change strengthens the visible response at that instant rather than moving the event earlier.
 - Static source inspection only. Browser playback and perceived sync still require user verification.
+
+
+## Contact-sync and recovery refinement — commit `6acd0d2`
+
+- Punch extension now holds back during most of its travel and accelerates through the final 18% before the authored contact point. This is intended to make the visible hand/body contact occur at the same instant as the target's `react` event, rather than making the fist appear to arrive early.
+- `react` and `hit` events now use a shorter default event duration of 8% of the scene (unless an explicit `end` is authored). In the 8-second fixture this is about 0.64 seconds, instead of the previous 2.24-second fallback.
+- The initial knockback still begins at the authored `react.at` time (58%); the event time itself has not been moved earlier.
+- Static source inspection only. Browser playback is still required to verify perceived contact sync and recovery quality.
