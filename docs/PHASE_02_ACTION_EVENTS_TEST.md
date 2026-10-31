@@ -212,3 +212,27 @@ Static source checks only. Inline JavaScript syntax and fixture JSON must be che
 - Latest block-pose refinement: replaced the shared-centerline angle pose with two independently drawn, mirrored guard arms. Each arm starts from its own left/right shoulder anchor, bends outward at the elbow, and brings the fist back beside the face. The block-only draw path is isolated; punch and dodge arm geometry are unchanged. This is a visual pose refinement, not physical collision detection.
 
 - Screenshot-driven correction (`Weird Block.PNG`): the prior mirrored guard kept each fist too far outside its own elbow, producing a side-mounted `<>` silhouette. The revised mirrored path places elbows wider (`±46`) and fists inward beside the cheeks (`±28`, y `-267`), with two curved segments per arm. Verify that both fists read as a compact face-level guard and do not overlap the face.
+
+## Follow-up: visible rear glove and tucked-elbow geometry
+
+Source commit: `03d6e49e4682283dadcec7844a58655d458f5628`
+
+The Block7/Block8 review showed the rear glove was disappearing behind the head/torso silhouette, while the near-side arm read as a diagonal slash across the chest. The human rig's block geometry was revised:
+
+- Rear glove now sits outside the rear edge of the head silhouette at cheek/temple height, so both hands read as a guard in profile.
+- Both high-guard elbows sit close to the torso instead of flaring outward.
+- Hook block raises the near glove beside the temple while keeping the elbow tucked.
+- Body block places the near elbow at the rib line; the far glove stays high.
+- Front-facing block retains a two-arm guard, with each glove visible on its own side of the face.
+
+### Acceptance checks
+
+1. Side view: both gloves are identifiable; rear glove is not swallowed by the head.
+2. Side view: forearms form compact upward shields, not a crossed diagonal over the chest.
+3. High/head block: elbows remain near ribs and chin remains visible enough to track the opponent.
+4. Hook block: near glove protects the temple; far glove remains near the opposite cheek.
+5. Body block: near elbow closes the rib line while far glove protects the head.
+6. Front view: both hands remain distinct and balanced.
+7. Re-run the existing punch-only and dodge + block fixtures.
+
+Visual acceptance still requires running the renderer in a browser; source geometry has been committed but not browser-render verified.
